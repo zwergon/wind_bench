@@ -16,10 +16,10 @@ def get_requirements():
 setuptools.setup(
     name             = "ai.virtual", # Replace with your own username
     version          = "0.0.1",
-    author           = "lecomtje",
-    url              = "https://gitlab.ifpen.fr/lecomtje/toy-model.git",
-    author_email     = "jean-francois.lecomte@ifpen.fr",
-    description      = "Series temporelles de tests pour virtual sensors",
+    author           = "atjia",
+    url              = "https://gitlab.ifpen.fr/lecomtje/ai.virtual.git",
+    author_email     = "aissata.atji@ifpen.fr",
+    description      = " ",
     packages= ['ai_virtual']
     #install_requires=get_requirements()
 )
