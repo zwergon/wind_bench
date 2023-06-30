@@ -4,6 +4,7 @@ from ai_virtual.model import get_model
 from ai_virtual.training import train_test_model
 import torch
 
+
 if __name__=="__main__":
     config={
         'model_name': "ConvAutoEnc",
@@ -12,12 +13,16 @@ if __name__=="__main__":
         'learning_rate': 1e-4,
         'kernel_size': 3,
         'epoch': 100,
-        'batch_size': 32
+        'batch_size': 2048
     }
 
-    dataset=FSBDataset("D:/work/ai.virtual/data/five_story_building_ts_with_us_1000.npy")
+    all_dataset=FSBDataset("D:/lecomtje/Repositories/MPU/toymodel/git-toymodel/data/five_story_building_ts_with_us_1000.npy")
 
-    train_size = int(0.6 * len(dataset))
+    dataset = torch.utils.data.Subset(all_dataset, range(48000) )
+
+
+    print(f"Dataset size {len(dataset)}")
+    train_size = int(0.8 * len(dataset))
     test_size = len(dataset) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [train_size, test_size])
 
@@ -26,5 +31,5 @@ if __name__=="__main__":
     
     device = torch.device("cuda")
 
+
     train_test_model(get_model(config), train_loader, test_loader, config, device)
-     

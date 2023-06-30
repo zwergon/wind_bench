@@ -2,7 +2,11 @@ from torch import nn as nn
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+import time as timer
 
+
+start = torch.cuda.Event(enable_timing=True)
+end = torch.cuda.Event(enable_timing=True)
 
 def optimiseur(model, config):
     return torch.optim.Adam(model.parameters(), lr=config['learning_rate'])
@@ -11,7 +15,7 @@ def loss_function(device):
     return nn.MSELoss().to(device)
 
 def train_test_model(model, train_loader, test_loader, config, device):
-    model=model.to(device)
+    model.to(device)
     model.train()
     losses_train = []
     losses_test = []
@@ -19,9 +23,12 @@ def train_test_model(model, train_loader, test_loader, config, device):
     optimizer = optimiseur(model, config)
 
     for epoch in range(config['epoch']):
+
+        start.record()
+        start_cpu = timer.time()
         for (data_batch, y_batch) in train_loader:
-            data_batch = data_batch.float().to(device)
-            y_batch = y_batch.float().to(device)
+            data_batch = data_batch.to(device)
+            y_batch = y_batch.to(device)
             optimizer.zero_grad()
             prediction = model(data_batch)
             loss = criterion(prediction, y_batch)
@@ -29,12 +36,18 @@ def train_test_model(model, train_loader, test_loader, config, device):
             optimizer.step()
         losses_train.append(loss.item())
         print(f'epoch= {epoch} loss = {loss: .3}')
+        end.record()
+        end_cpu = timer.time()
+        # Waits for everything to finish running
+        torch.cuda.synchronize()
+        print(f"Time elapsed (GPU): {start.elapsed_time(end)}") 
+        print(f"Time elapsed (Global): {end_cpu - start_cpu}") 
 
         model.eval()
         loss = 0.
         for (data_batch, y_batch) in test_loader:
-            data_batch = data_batch.float().to(device)
-            y_batch = y_batch.float().to(device)
+            data_batch = data_batch.to(device)
+            y_batch = y_batch.to(device)
             with torch.no_grad():
                 prediction = model(data_batch)
                 loss+= criterion(prediction, y_batch)
