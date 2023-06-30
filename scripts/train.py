@@ -12,20 +12,11 @@ if __name__=="__main__":
         'output_channels': 1,
         'learning_rate': 1e-4,
         'kernel_size': 3,
-<<<<<<< HEAD
         'epoch': 250,
         'batch_size': 2048
     }
 
     all_dataset=FSBDataset("D:/work/ai.virtual/data/five_story_building_ts_with_us_1000.npy")
-=======
-        'epoch': 100,
-        'batch_size': 2048
-    }
-
-    all_dataset=FSBDataset("D:/lecomtje/Repositories/MPU/toymodel/git-toymodel/data/five_story_building_ts_with_us_1000.npy")
->>>>>>> ac28e6bf6857bbfb5af6522d368375a17f376f26
-
     dataset = torch.utils.data.Subset(all_dataset, range(48000) )
 
 
@@ -39,11 +30,7 @@ if __name__=="__main__":
     
     device = torch.device("cuda")
 
-<<<<<<< HEAD
     y_true, y_pred, loss_train, loss_test = train_test_model(get_model(config), train_loader, test_loader, config, device)
     train_test_plot(y_true, y_pred, loss_train, loss_test, config)
-
-=======
-
     train_test_model(get_model(config), train_loader, test_loader, config, device)
->>>>>>> ac28e6bf6857bbfb5af6522d368375a17f376f26
+
