@@ -26,22 +26,27 @@ def train_test_model(model, train_loader, test_loader, config, device):
 
         start.record()
         start_cpu = timer.time()
+        batch = 0
+        loss=0.
         for (data_batch, y_batch) in train_loader:
+            batch+= 1
             data_batch = data_batch.to(device)
             y_batch = y_batch.to(device)
             optimizer.zero_grad()
             prediction = model(data_batch)
-            loss = criterion(prediction, y_batch)
-            loss.backward()
+            train_loss= criterion(prediction, y_batch)
+            train_loss.backward()
             optimizer.step()
-        loss_train.append(loss.item())
+            loss+= train_loss.item()
+        loss/=batch
+        loss_train.append(loss)
         print(f'epoch= {epoch} loss = {loss: .3}')
         end.record()
         end_cpu = timer.time()
         # Waits for everything to finish running
         torch.cuda.synchronize()
-        print(f"Time elapsed (GPU): {start.elapsed_time(end)}") 
-        print(f"Time elapsed (Global): {end_cpu - start_cpu}") 
+        print(f"Time elapsed (GPU): {start.elapsed_time(end)}")
+        print(f"Time elapsed (Global): {end_cpu - start_cpu}")
 
         model.eval()
         loss = 0.
