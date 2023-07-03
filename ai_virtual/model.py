@@ -6,9 +6,9 @@ class Conv1dAutoEncodeur(nn.Module):
         self.encodeur=nn.Sequential(
                       nn.Conv1d(config['input_channels'], 32, kernel_size=config['kernel_size']),
                       nn.ReLU(),
-                      nn.Conv1d(32, 16,kernel_size=config['kernel_size']),
+                      nn.Conv1d(32, 16, kernel_size=config['kernel_size']),
                       nn.ReLU(),
-                      nn.Conv1d(16, 8,kernel_size=config['kernel_size']) 
+                      nn.Conv1d(16, 8, kernel_size=config['kernel_size']) 
                             )
         self.decodeur=nn.Sequential(
                       nn.ConvTranspose1d(8, 16, kernel_size=config['kernel_size']),
@@ -30,9 +30,9 @@ class MultiChannelModel(nn.Module):
         self.encodeur = nn.Sequential(
                       nn.Conv1d(config['input_channels'], 32, kernel_size=config['kernel_size']),
                       nn.LeakyReLU(0.01),
-                      nn.Conv1d(32, 16,kernel_size=config['kernel_size']),
+                      nn.Conv1d(32, 16, kernel_size=config['kernel_size']),
                       nn.LeakyReLU(0.01),
-                      nn.Conv1d(16, 8,kernel_size=config['kernel_size']),
+                      nn.Conv1d(16, 8, kernel_size=config['kernel_size']),
                       nn.LeakyReLU(0.01),
                       nn.MaxPool1d(2, return_indices=True),
                             )
