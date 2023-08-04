@@ -43,14 +43,14 @@ class LitModel(pl.LightningModule):
         loss, y_pred, y = self._common_step(batch, batch_idx)
         mae = nn.L1Loss()(y.cpu(), y_pred.detach().cpu())
         self.log('train_loss', loss, prog_bar=True)
-        self.log('MAE_train', mae, prog_bar=False)
+        self.log('MAE_train', mae, prog_bar=True)
         return loss
     
     def validation_step(self, batch, batch_idx):
         loss, y_pred, y = self._common_step(batch, batch_idx)
         mae = nn.L1Loss()(y.cpu(), y_pred.cpu())
         self.log('val_loss', loss, prog_bar=True)
-        self.log('MAE_test', mae, prog_bar=False)
+        self.log('MAE_test', mae, prog_bar=True)
         return loss
     
     def test_step(self, batch, batch_idx):
