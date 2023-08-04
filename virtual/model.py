@@ -66,7 +66,7 @@ class LitModel(pl.LightningModule):
         plt.figure()
         plt.plot(self.y_true[0,0,:], label="y_true")
         plt.plot(self.y_pred[0,0,:], label="y_pred")
-        plt.set_title("variable_1_ batch_1")
+        plt.title("variable_1_ batch_1")
         plt.show()
 
     def configure_optimizers(self):
