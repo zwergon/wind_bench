@@ -1,0 +1,22 @@
+{
+
+    "n_samples": 10000,
+    "normalization": true,
+    "root_path": "D:/lecomtje/Repositories/MPU/data/wb",
+    "s3_file": "wind_bench.parquet",
+    "ratio_train_test": 0.1,
+    "sequence_length":1024,
+
+    "type": "CNN",
+    "hidden_size":10, 
+    "num_layers":1, 
+    "kernel_size": 7,
+    
+    "learning_rate":2e-5,
+    "weight_decay": 3e-3, 
+    "epoch": 100, 
+    "batch_size":128,
+    "index": 1
+     
+     
+}

@@ -13,7 +13,9 @@ if __name__=="__main__":
         'kernel_size': 3,
         'epoch': 3,
         'batch_size': 2,
-        'num_workers': 2
+        'num_workers': 2,
+        'kind': "File",
+        'filename': "D:\\lecomtje\\Repositories\\MPU\\data\\wind_bench.parquet"
     }
     
     logger = TensorBoardLogger("tb-logger", name="my_model")
@@ -23,4 +25,4 @@ if __name__=="__main__":
     trainer = pl.Trainer(logger=logger, accelerator="cuda", devices=1, min_epochs=1, max_epochs=config["epoch"])
     trainer.fit(model, dm)
     trainer.validate(model, dm)
-    #trainer.test(model, dm)
+    trainer.test(model, dm)
