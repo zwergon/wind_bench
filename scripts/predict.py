@@ -42,6 +42,19 @@ def get_one_output(model, test_loader, index):
         return actual[index, 0, :].numpy(), predicted[index, 0, :].numpy()
 
 
+def get_state_dict(args):
+
+        if "state_dict" in args.__dict__: 
+                params = torch.load(os.path.join(args.data_dir, args.state_dict))
+                if ".ckpt" in args.state_dict:
+                        state_dict = {key.replace("model.", ""): val for key, val in params['state_dict'].items()}
+                else:
+                        state_dict = params
+        else:
+                state_dict = torch.load(os.path.join(args.data_dir, f"model_{args.type.lower()}.pth"))
+       
+        return state_dict
+
 if __name__ == "__main__":
 
         args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
@@ -57,9 +70,7 @@ if __name__ == "__main__":
 
         print(f"Type Network: {args.type}")
         model = get_model(test_dataset.input_size, test_dataset.output_size, args.__dict__)
-
-        params = torch.load(os.path.join(args.data_dir, f"model_{args.type.lower()}.pth"))
-        model.load_state_dict(params)
+        model.load_state_dict(get_state_dict(args))
 
         #real_outputs, predicted_outputs = get_all_predicted(model, test_loader, y_test)
         real_outputs, predicted_outputs = get_one_output(model, test_loader, args.index)
@@ -69,8 +80,8 @@ if __name__ == "__main__":
 
         # Plot actual vs. predicted values
         plt.figure(figsize=(9, 6))
-        plt.plot(real_outputs[args.kernel_size:-args.kernel_size], label='Actual')
-        plt.plot(predicted_outputs[args.kernel_size:-args.kernel_size], label='Predicted')
+        plt.plot(real_outputs[0:], label='Actual')
+        plt.plot(predicted_outputs[0:], label='Predicted')
         plt.xlabel('Time')
         plt.ylabel('Mudline Moment')
         plt.title('Actual vs. Predicted')

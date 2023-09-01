@@ -12,8 +12,10 @@ class LSTMModel(nn.Module):
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
+        x = torch.swapaxes(x, 1, 2)
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out)
+        out = torch.swapaxes(out, 1, 2)
         return out

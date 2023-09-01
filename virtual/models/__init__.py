@@ -4,6 +4,7 @@
 from virtual.models.LSTM import LSTMModel
 from virtual.models.CNN import CNNModel
 from virtual.models.MLP import MLPModel
+from virtual.models.RNN  import RNNVanilla
 
 def get_model(input_size, output_size, config: dict):
      
@@ -27,6 +28,12 @@ def get_model(input_size, output_size, config: dict):
             output_size,
             kernel_size=config['kernel_size']
             ) 
+    elif kind == "RNN":
+        model = RNNVanilla(
+            input_size,
+            output_size,
+            config['hidden_size']
+        )
     else:
         raise Exception(f"model of type {kind} is not handled")
 

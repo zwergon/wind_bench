@@ -4,3 +4,6 @@ data
 *.egg-info
 virtualenv
 tb-logger
+*/__pycache__
+*/*/__pycache__
+.vscode

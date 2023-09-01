@@ -1,22 +1,23 @@
 {
-
-    "n_samples": 10000,
+    "dataset": "numpy",
+    "n_samples": 1000,
     "normalization": true,
     "root_path": "D:/lecomtje/Repositories/MPU/data/wb",
     "s3_file": "wind_bench.parquet",
     "ratio_train_test": 0.1,
-    "sequence_length":1024,
+    "sequence_length":200,
+    "num_workers": 2,
 
-    "type": "CNN",
-    "hidden_size":10, 
+    "type": "RNN",
+    "indices": [0],
+    "hidden_size":100, 
     "num_layers":1, 
-    "kernel_size": 7,
+    "kernel_size": 5,
     
     "learning_rate":2e-5,
     "weight_decay": 3e-3, 
-    "epoch": 100, 
-    "batch_size":128,
+    "epoch": 300, 
+    "batch_size":32,
     "index": 1
-     
      
 }
