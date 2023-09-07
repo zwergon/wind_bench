@@ -2,11 +2,20 @@ import torch
 from torch import nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from virtual.checkpoint import CheckPoint
 
-def train_test(model, train_loader, test_loader, config, device):
+def train_test(model, train_loader, test_loader, context: dict):
+
+    logger = context['logger']
+    config = context['config']
+    device = context['device']
+    checkpoint: CheckPoint = context['checkpoint']
+
+
+    logger.summary(config, device, train_loader, test_loader)
+
     num_epochs = config["epoch"]
-    train_losses = []
-    test_losses = []
+ 
     criterion = nn.MSELoss()
     optimizer = optim.Adam(
         model.parameters(), 
@@ -15,9 +24,10 @@ def train_test(model, train_loader, test_loader, config, device):
         )
    
     for epoch in range(num_epochs):
+
+        #Train
         model.train()
         train_loss = 0.0
-
         for inputs, labels in train_loader:
             inputs = inputs.to(device)
             labels = labels.to(device)
@@ -29,8 +39,8 @@ def train_test(model, train_loader, test_loader, config, device):
             train_loss += loss.item()
 
         train_loss /= len(train_loader)
-        train_losses.append(train_loss)
-
+        
+        # Test
         model.eval()
         test_loss = 0.0
 
@@ -42,17 +52,30 @@ def train_test(model, train_loader, test_loader, config, device):
                 loss = criterion(outputs, labels)
 
                 test_loss += loss.item()
-
+        
         test_loss /= len(test_loader)
-        test_losses.append(test_loss)
-        if epoch % 10 == 0:
-            print(f"Epoch {epoch}/{num_epochs}, Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}")
+   
 
+        # Reporting
+        if epoch % 100 == 0:
+            index = 0
+            offset = 10
+            inputs, actual = next(iter(test_loader))
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            with torch.no_grad():
+                predicted = model(inputs)
+
+            logger.report_predict(
+                epoch, 
+                actual[index, 0, :].detach().cpu().numpy(), 
+                predicted[index, 0, :].detach().cpu().numpy(),
+                offset)
+            
+            checkpoint.save(epoch=epoch, model=model, optimizer=optimizer, loss=test_loss)
+
+        logger.report_loss(epoch, train_loss, test_loss, config)
+        
+        
               
-    plt.plot(train_losses, label='Train Loss')
-    plt.plot(test_losses, label='Test Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Training and Test Loss Curves')
-    plt.legend()
-    plt.show()
+    

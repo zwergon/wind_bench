@@ -57,11 +57,14 @@ def get_state_dict(args):
 
 if __name__ == "__main__":
 
+        offset = 10
+        index = 0
+
         args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
 
 
-        test_dataset = NumpyWBDataset(args.data_dir, train_flag=False, indices=[0])
-        test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+        test_dataset = NumpyWBDataset(args.data_dir, train_flag=False, indices=args.indices)
+        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
         
         X_test, y_test = next(iter(test_loader))
         print(f"X_test : {X_test.shape}")
@@ -73,15 +76,15 @@ if __name__ == "__main__":
         model.load_state_dict(get_state_dict(args))
 
         #real_outputs, predicted_outputs = get_all_predicted(model, test_loader, y_test)
-        real_outputs, predicted_outputs = get_one_output(model, test_loader, args.index)
+        real_outputs, predicted_outputs = get_one_output(model, test_loader, index)
 
         # real_outputs = real_outputs - np.mean(real_outputs)
         # predicted_outputs = predicted_outputs - np.mean(predicted_outputs)
 
         # Plot actual vs. predicted values
         plt.figure(figsize=(9, 6))
-        plt.plot(real_outputs[0:], label='Actual')
-        plt.plot(predicted_outputs[0:], label='Predicted')
+        plt.plot(real_outputs[offset:], label='Actual')
+        plt.plot(predicted_outputs[offset:], label='Predicted')
         plt.xlabel('Time')
         plt.ylabel('Mudline Moment')
         plt.title('Actual vs. Predicted')

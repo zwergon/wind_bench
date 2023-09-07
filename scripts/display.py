@@ -11,7 +11,7 @@ from args import Args
 if __name__ == "__main__":
     args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
 
-    dataset = NumpyWBDataset(args.data_dir, train_flag=False)
+    dataset = NumpyWBDataset(args.data_dir, train_flag=False, indices=args.indices)
         
     print(f"train dataset (size) {len(dataset)}")
 
