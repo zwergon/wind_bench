@@ -1,6 +1,6 @@
 
 
-
+from virtual.models.LSTM_CNN import LSTMCNNModel
 from virtual.models.LSTM import LSTMModel
 from virtual.models.CNN import CNNModel
 from virtual.models.MLP import MLPModel
@@ -15,9 +15,10 @@ def get_model(input_size, output_size, config: dict):
             input_size,
             config['hidden_size'],
             config['num_layers'], 
-            output_size
+            output_size,
+            config['dropout']
             )
-    elif type == "MLP":
+    elif kind == "MLP":
         model = MLPModel(
             input_size, 
             output_size
@@ -32,8 +33,18 @@ def get_model(input_size, output_size, config: dict):
         model = RNNVanilla(
             input_size,
             output_size,
-            config['hidden_size']
+            config['hidden_size'],
+            config['dropout']
         )
+    elif kind == "LSTM_CNN":
+        model = LSTMCNNModel(
+            input_size,
+            config['hidden_size'],
+            config['num_layers'], 
+            output_size,
+            config['dropout']
+            )
+    
     else:
         raise Exception(f"model of type {kind} is not handled")
 

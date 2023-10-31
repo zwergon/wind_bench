@@ -1,5 +1,5 @@
 
-from clearml import Task
+from clearml import Task, Dataset
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -13,7 +13,9 @@ class Logger:
     def init(self, task_name, config):
         print(f"init {task_name}")
         if self.clearml:
-            task = Task.init(project_name="wb-virtual", task_name=task_name)
+            task = Task.init(project_name="wb_virtual(Aissata)", task_name=task_name)
+            #dataset_folder = Dataset.get(dataset_id='169b71b12bac41fe9ee2e8af1e255a7e').get_local_copy()
+            #config['data_dir'] = dataset_folder
             task.connect(config)
             self.logger = task.get_logger()
 
@@ -28,15 +30,17 @@ class Logger:
         print(f"y_test : {y_test.shape}")
         print(f"Type Network: {config['type']}")
 
-    def report_loss(self, epoch, train_loss, test_loss, config):
+    def report_loss(self, epoch, train_loss, test_loss, mae_train, mae_test, config):
         num_epochs = config['epoch']
 
         if self.logger is not None:
-            self.logger.report_scalar("Train/Test MSE", "Train", train_loss, iteration=epoch)
-            self.logger.report_scalar("Train/Test MSE", "Test", test_loss, iteration=epoch)
+            self.logger.report_scalar("Train/Test dilate", "Train", train_loss, iteration=epoch)
+            self.logger.report_scalar("Train/Test dilate", "Test", test_loss, iteration=epoch)
+            self.logger.report_scalar("Train/Test mae", "Train", mae_train, iteration=epoch)
+            self.logger.report_scalar("Train/Test mae", "Test", mae_test, iteration=epoch)
 
         if epoch % 10 == 0:
-            print(f"Epoch {epoch}/{num_epochs}, Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}")
+            print(f"Epoch {epoch}/{num_epochs}, Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}, MAE train: {mae_train:.4f}, MAE test: {mae_test:.4f}")
 
         
     def report_predict(self, epoch, real_outputs, predicted_outputs, offset=0):
@@ -61,6 +65,3 @@ class Logger:
                 xaxis="Time",
                 yaxis="Mudline Moment"
             )
-
-
-       
