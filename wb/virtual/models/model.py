@@ -3,7 +3,7 @@ from torch import nn as nn
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 
-from virtual.models import get_model
+from wb.virtual.models import get_model
 
 class LitModel(pl.LightningModule):
     def __init__(self, input_size=8, output_size=6, config={}):

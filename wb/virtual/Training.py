@@ -1,8 +1,8 @@
 import torch
 from torch import nn
 import torch.optim as optim
-from virtual.checkpoint import CheckPoint
-from virtual.loss_function import get_loss
+from wb.virtual.checkpoint import CheckPoint
+from wb.virtual.loss_function import get_loss
 
 
 def train_test(model, train_loader, test_loader, context: dict):

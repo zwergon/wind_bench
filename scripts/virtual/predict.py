@@ -4,8 +4,8 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
 
-from virtual.models import get_model
-from wind_bench.dataset import NumpyWBDataset
+from wb.virtual.models import get_model
+from wb.dataset import NumpyWBDataset
 
 from args import Args
 

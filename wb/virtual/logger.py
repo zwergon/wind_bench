@@ -13,9 +13,7 @@ class Logger:
     def init(self, task_name, config):
         print(f"init {task_name}")
         if self.clearml:
-            task = Task.init(project_name="wb_virtual(Aissata)", task_name=task_name)
-            #dataset_folder = Dataset.get(dataset_id='169b71b12bac41fe9ee2e8af1e255a7e').get_local_copy()
-            #config['data_dir'] = dataset_folder
+            task = Task.init(project_name=config['project'], task_name=task_name)
             task.connect(config)
             self.logger = task.get_logger()
 

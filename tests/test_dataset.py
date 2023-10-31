@@ -1,10 +1,10 @@
 import unittest
 import os
 import torch
-from wind_bench.dataloader import NaiveDataLoader
 
-from wind_bench.utils.time_utils import Timer
-from wind_bench.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset
+from wb.dataset.dataloader import NaiveDataLoader
+from wb.dataset.utils.time_utils import Timer
+from wb.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset
 
 
 

@@ -1,9 +1,9 @@
 import os
 import torchaudio
-from wind_bench.data_module import WBDataModule
+from wb.dataset.data_module import WBDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
-from virtual.models.model import LitModel
+from wb.virtual.models.model import LitModel
 
 from args import Args
 

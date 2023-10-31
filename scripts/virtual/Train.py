@@ -2,13 +2,13 @@ import os
 import torch
 from torch.utils.data import DataLoader
 
-from wind_bench.dataset import NumpyWBDataset
+from wb.dataset import NumpyWBDataset
 
-from virtual.models import get_model
-from virtual.Training import train_test
+from wb.virtual.models import get_model
+from wb.virtual.Training import train_test
 
-from virtual.logger import Logger
-from virtual.checkpoint import CheckPoint
+from wb.virtual.logger import Logger
+from wb.virtual.checkpoint import CheckPoint
 
 from args import Args
 

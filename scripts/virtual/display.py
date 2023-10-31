@@ -4,7 +4,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from wind_bench.dataset import NumpyWBDataset
+from wb.dataset import NumpyWBDataset
 
 from args import Args
 
@@ -15,13 +15,13 @@ if __name__ == "__main__":
         
     print(f"train dataset (size) {len(dataset)}")
 
-    X_idx, y_idx = dataset[args.index]
+    X_idx, y_idx = dataset[args.indices[0]]
 
     print(f"X_test : {X_idx.shape}")
     print(f"y_test : {y_idx.shape}")
 
     fig, (ax1, ax2) = plt.subplots(2, 1)
-    fig.suptitle( f"X (solid) versus y (dash) for idx:{args.index}")
+    fig.suptitle( f"X (solid) versus y (dash) for idx:{args.indices[0]}")
 
     print(X_idx.shape, y_idx.shape)
     for i in range(X_idx.shape[0]):

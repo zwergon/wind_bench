@@ -2,8 +2,8 @@ import unittest
 import os
 import torch
 
-from wind_bench.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset
-from virtual.models import get_model
+from wb.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset
+from wb.virtual.models import get_model
 from args import Args
 
 class TestDataset(unittest.TestCase):

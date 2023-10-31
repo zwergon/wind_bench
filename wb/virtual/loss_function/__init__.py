@@ -1,7 +1,7 @@
 import torch
 from torch import nn
-from virtual.loss_function.dilate import Dilate
-from virtual.loss_function.rmse import RMSELoss
+from wb.virtual.loss_function.dilate import Dilate
+from wb.virtual.loss_function.rmse import RMSELoss
 
 def get_loss(device, config: dict):
      

@@ -1,10 +1,10 @@
 
 
-from virtual.models.LSTM_CNN import LSTMCNNModel
-from virtual.models.LSTM import LSTMModel
-from virtual.models.CNN import CNNModel
-from virtual.models.MLP import MLPModel
-from virtual.models.RNN  import RNNVanilla
+from wb.virtual.models.LSTM_CNN import LSTMCNNModel
+from wb.virtual.models.LSTM import LSTMModel
+from wb.virtual.models.CNN import CNNModel
+from wb.virtual.models.MLP import MLPModel
+from wb.virtual.models.RNN  import RNNVanilla
 
 def get_model(input_size, output_size, config: dict):
      
@@ -15,8 +15,7 @@ def get_model(input_size, output_size, config: dict):
             input_size,
             config['hidden_size'],
             config['num_layers'], 
-            output_size,
-            config['dropout']
+            output_size
             )
     elif kind == "MLP":
         model = MLPModel(
