@@ -2,7 +2,7 @@
 import json
 import os
 
-from wb.dataset.utils.meta_singleton import MetaSingleton
+from wb.utils.meta_singleton import MetaSingleton
 
 
 class Config(object, metaclass=MetaSingleton):

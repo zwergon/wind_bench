@@ -8,7 +8,6 @@ class Args:
         with open(jsonname, 'r') as file:
             self.__dict__ = json.load(file)
 
-
     @property
     def data_dir(self):
         return os.path.join(self.root_path, f"{self.n_samples}_{self.sequence_length}")

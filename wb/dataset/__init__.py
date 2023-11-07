@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 import pyarrow.parquet as pq
 
 from wb.dataset.s3 import S3
-from wb.dataset.utils.time_utils import Timer
+from wb.utils.time_utils import Timer
 
 
 
@@ -134,3 +134,74 @@ class NumpyWBDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.X[idx, :, :], self.y[idx, self.indices, :]
+
+
+from azureml.fsspec import AzureMachineLearningFileSystem
+
+
+class AzureDataset(Dataset):
+    x_columns = [
+            "Tower top fore-aft acceleration ay [m/s2]",
+            "Tower top side-side acceleration ax [m/s2]",
+            "Tower mid fore-aft acceleration ay [m/s2]",
+            "Tower mid side-side acceleration ax [m/s2]",
+            "Tower top rotation x [deg]",
+            "Tower top rotation y [deg]",
+            "Tower mid rotation x [deg]",
+            "Tower mid rotation y [deg]"
+        ]
+    
+    y_columns = [
+        "Mudline moment Mx[kNm]",
+        "Mudline moment My[kNm]",
+        "Mudline moment Mz[kNm]",
+        "Waterline moment Mx[kNm]",
+        "Waterline moment My[kNm]",
+        "Waterline moment Mz[kNm]"
+    ]
+    
+    def __init__(self, uri, train_flag, train_test_ratio):
+
+        self.fs = AzureMachineLearningFileSystem(uri)
+        self.train_flag = train_flag
+        self.train_test_ratio = train_test_ratio
+        self.train = []
+        self.test = []
+        self.keys = []
+
+        keys = self.fs.glob("**/*.parquet")
+        
+        self._split_train_test(keys)
+
+    @property
+    def input_size(self):
+        return len(self.x_columns)
+    
+    @property
+    def output_size(self):
+        return len(self.y_columns)
+
+    def __getitem__(self, idx):
+        key = self.keys[idx]
+        table = pq.read_table(
+            key, 
+            columns=self.x_columns + self.y_columns,
+            filesystem=self.fs
+            )
+
+        X = np.array(table.select(self.x_columns), dtype=np.float32)
+        y = np.array(table.select(self.y_columns), dtype=np.float32)
+        return X, y
+
+    def __len__(self):
+        return len(self.keys)
+    
+    def _split_train_test(self, keys: list):
+        for _ in range(int(self.train_test_ratio*len(keys))):
+            self.train.append(keys.pop())
+        self.test = keys
+
+        if self.train_flag:
+            self.keys = self.train
+        else:
+            self.keys = self.test

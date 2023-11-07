@@ -8,7 +8,7 @@ class Logger:
 
     def __init__(self) -> None:
         self.logger = None
-        self.clearml = True
+        self.clearml = False
 
     def init(self, task_name, config):
         print(f"init {task_name}")
