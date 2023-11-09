@@ -3,6 +3,8 @@ from clearml import Task, Dataset
 import matplotlib.pyplot as plt
 import numpy as np
 
+import mlflow
+
 
 class Logger:
 
@@ -36,6 +38,8 @@ class Logger:
             self.logger.report_scalar("Train/Test dilate", "Test", test_loss, iteration=epoch)
             self.logger.report_scalar("Train/Test mae", "Train", mae_train, iteration=epoch)
             self.logger.report_scalar("Train/Test mae", "Test", mae_test, iteration=epoch)
+        
+        mlflow.log_metrics( {"train_loss": train_loss, "test_loss":test_loss}, step=epoch)
 
         if epoch % 10 == 0:
             print(f"Epoch {epoch}/{num_epochs}, Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}, MAE train: {mae_train:.4f}, MAE test: {mae_test:.4f}")

@@ -4,14 +4,14 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from wb.dataset import NumpyWBDataset
+from wb.dataset import dataset
 
-from args import Args
+from wb.utils.args import Args
 
 if __name__ == "__main__":
     args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
 
-    dataset = NumpyWBDataset(args.data_dir, train_flag=False, indices=args.indices)
+    dataset, _ = dataset(args)
         
     print(f"train dataset (size) {len(dataset)}")
 

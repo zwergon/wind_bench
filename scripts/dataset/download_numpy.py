@@ -5,8 +5,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from wb.dataset.s3 import S3
-from wb.dataset.dataset import WBDataset
-from args import Args
+from wb.dataset import WBDataset
+from wb.utils.args import Args
 from tqdm import tqdm
 
 

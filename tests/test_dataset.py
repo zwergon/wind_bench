@@ -3,7 +3,7 @@ import os
 import torch
 
 from wb.dataset.dataloader import NaiveDataLoader
-from wb.dataset.utils.time_utils import Timer
+from wb.utils.time_utils import Timer
 from wb.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset
 
 
@@ -14,7 +14,7 @@ class TestDataset(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.root_path = os.path.join(os.path.dirname(__file__), "../../data/wb/100_1024")
+        self.root_path = os.path.join(os.path.dirname(__file__), "data/100_128")
         
     def test_file_dataset(self):
         

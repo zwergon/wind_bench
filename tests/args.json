@@ -2,8 +2,8 @@
 
     "n_samples": 100,
     "normalization": true,
-    "root_path": "./data",
-    "s3_file": "wind_bench.parquet",
+    "root_path": "file://./data",
+    "file": "wind_bench.parquet",
     "ratio_train_test": 0.1,
     "sequence_length":128,
 

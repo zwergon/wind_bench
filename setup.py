@@ -22,5 +22,5 @@ setup(name='wb-virtual',
       author='Jean-François Lecomte',
       author_email='jean-francois.leocmte@ifpen.fr',
       url= "https://gitlab.ifpen.fr/lecomtje/wb-dataset.git",
-      packages=['virtual' ]
+      packages=['wb', "wb/virtual", "wb/dataset", "wb/dataset/s3", "wb/utils"]
 )
