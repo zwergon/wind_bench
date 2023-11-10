@@ -131,6 +131,15 @@ class S3WBDataset(WBDataset):
 
 class FileWBDataset(WBDataset):
 
+    @staticmethod
+    def _search_parquets(rootdir):
+        file_list = []
+        for root, directories, file in os.walk(rootdir):
+            for file in file:
+                if(file.endswith(".parquet")):
+                    file_list.append(os.path.join(root, file))
+        return file_list
+
     def __init__(self, 
                 parquet_file, 
                 train_flag=True, 
@@ -144,7 +153,7 @@ class FileWBDataset(WBDataset):
             )
 
         keys = []
-        for file in glob.glob("*/*.parquet", root_dir=parquet_file):
+        for file in self._search_parquets(parquet_file):
             keys.append(os.path.join(parquet_file, file))
 
         self._split_train_test(keys)
