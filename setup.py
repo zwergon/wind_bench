@@ -1,3 +1,5 @@
+from setuptools import setup
+
 import setuptools
 
 #load requirements
@@ -13,13 +15,12 @@ def get_requirements():
 
     return install_requires
 
-setuptools.setup(
-    name             = "ai.virtual", # Replace with your own username
-    version          = "0.0.1",
-    author           = "atjia",
-    url              = "https://gitlab.ifpen.fr/lecomtje/ai.virtual.git",
-    author_email     = "aissata.atji@ifpen.fr",
-    description      = " ",
-    packages= ['ai_virtual']
-    #install_requires=get_requirements()
+
+setup(name='wb-virtual',
+      version='1.0',
+      description='Customized Dataset for Wind Bechmark',
+      author='Jean-François Lecomte',
+      author_email='jean-francois.leocmte@ifpen.fr',
+      url= "https://gitlab.ifpen.fr/lecomtje/wb-dataset.git",
+      packages=['wb', "wb/virtual", "wb/dataset", "wb/dataset/s3", "wb/utils"]
 )

@@ -1,5 +1,14 @@
-venv
 __pycache__
 data
 *.egg-info
-virtualenv
+venvv
+tb-logger
+*/__pycache__
+*/*/__pycache__
+.vscode
+.amlignore
+.amlignore.amltmp
+.ipynb_aml_checkpoints
+*/*.amltmp
+checkpoint*.pth
+mlruns
