@@ -38,8 +38,8 @@ class LSTMCNNModel(nn.Module):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         out, (h0, c0) = self.lstm(x, (h0, c0))
-        out = self.sigmoid(out)
+        #out = self.sigmoid(out)
         out = self.fc(out)
-        #out = self.tanh(out)
+        #out = self.sigmoid(out)
         out = torch.swapaxes(out, 1, 2)
         return out

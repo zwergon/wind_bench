@@ -1,8 +1,7 @@
-venv
 __pycache__
 data
 *.egg-info
-virtualenv
+venvv
 tb-logger
 */__pycache__
 */*/__pycache__

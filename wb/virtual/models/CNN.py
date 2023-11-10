@@ -7,26 +7,21 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__()
         
         self.encodeur=nn.Sequential(
-                      nn.Conv1d(input_size, 15, kernel_size=kernel_size, padding="same"),
-                      nn.BatchNorm1d(15),
+                      nn.Conv1d(input_size, 7, kernel_size=kernel_size, padding="same"),
+                      nn.BatchNorm1d(7),
+                      #nn.Dropout(0.1),
                       nn.ReLU(),
-                      nn.Conv1d(15, 20, kernel_size=kernel_size, padding="same"),
-                      nn.BatchNorm1d(20),
-                      nn.ReLU(),
-                      nn.Conv1d(20, 25, kernel_size=kernel_size, padding="same"),
-                      nn.BatchNorm1d(25),
+                      nn.Conv1d(7, 5, kernel_size=kernel_size, padding="same"),
                       nn.ReLU()
                      )
 
         padding = (kernel_size - 1) // 2
         self.decodeur=nn.Sequential(   
-                      nn.ConvTranspose1d(25, 20, kernel_size=kernel_size, padding=padding),
-                      nn.BatchNorm1d(20),
+                      nn.ConvTranspose1d(5, 7, kernel_size=kernel_size, padding=padding),
+                      nn.BatchNorm1d(7),
                       nn.ReLU(),
-                      nn.ConvTranspose1d(20, 15, kernel_size=kernel_size, padding=padding),
-                      nn.BatchNorm1d(15),
-                      nn.ReLU(),
-                      nn.ConvTranspose1d(15, output_size, kernel_size=kernel_size, padding=padding)
+                      nn.ConvTranspose1d(7, output_size, kernel_size=kernel_size, padding=padding),
+                     
         )
 
 

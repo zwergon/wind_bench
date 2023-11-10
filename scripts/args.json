@@ -1,0 +1,28 @@
+{
+    "dataset": "numpy",
+    "n_samples": 1000,
+    "normalization": true,
+    "root_path": "D:/lecomtje/Repositories/MPU/data/wb",
+    "s3_file": "wind_bench.parquet",
+    "ratio_train_test": 0.1,
+    "sequence_length": 12000,
+    "num_workers": 3,
+
+    "type": "LSTM",
+    "indices": [0, 1, 2, 3, 4, 5],
+    "hidden_size": 20, 
+    "num_layers": 2, 
+    "kernel_size": 5,
+    
+    "learning_rate":0.0009888,      
+    "weight_decay": 1e-5, 
+    "epoch": 1001,
+    "batch_size":100,
+    "dropout": 0,
+    
+    "loss":"MSE",
+    "alpha":0.3,
+    "gamma":0.005,
+    "tune": false
+
+}

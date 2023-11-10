@@ -23,7 +23,7 @@ class MLPModel(nn.Module):
     def forward(self, x):
         x=x.view(x.size(0)*x.size(2),x.size(1))
         x = self.encodeur(x)
-        x=x.view(-1,x.size(1),200)
+        x=x.view(-1,x.size(1),2000)
         return x
 
     

@@ -1,30 +1,33 @@
 {
     "project": "wb_virtual",
-    "n_samples": 100,
+    "n_samples": 1000,
     "normalization": true,
     "_root_path_file": "file://D:/lecomtje/Repositories/MPU/data/wb",
     "_root_path_azure": "azureml://subscriptions/239dc480-600f-413c-ae8c-8a5bbc17ed87/resourcegroups/rg-ml-jef/workspaces/mltry/datastores/workspaceblobstore/paths/LocalUpload/e371ee7f73e78305a4dda0ecbf7ff7c9",
-    "_file": "numpy",
-    "root_path":     "file://D:/lecomtje/Repositories/MPU/data/wb",
-    "file": "wind_bench.parquet",
+    "_file": "wind_bench.parquet",
+    
+    "root_path": "file://D:/work/wb-dataset/normalize_data",
+    "file": "numpy",
+    
     "ratio_train_test": 0.9,
-    "sequence_length":1024,
+    "sequence_length":12000,
     "num_workers": 2,
 
     "type": "LSTM",
-    "indices": [0],
-    "hidden_size":50, 
-    "num_layers":1, 
+    "indices": [0, 1, 2, 3, 4, 5],
+    "hidden_size": 20, 
+    "num_layers": 2, 
     "kernel_size": 5,
-    "dropout": 0,
     
-    "learning_rate":6e-3,
-    "weight_decay": 6e-3, 
-    "epoch": 1000,
-    "batch_size":250,
+    "learning_rate":0.0009888,      
+    "weight_decay": 1e-5, 
+    "epoch": 1001,
+    "batch_size":100,
+    "dropout": 0,
     
     "loss":"MSE",
     "alpha":0.3,
-    "gamma":0.005
+    "gamma":0.005,
+    "tune": false
 
 }

@@ -219,21 +219,37 @@ class NumpyWBDataset(Dataset):
         return self.X[idx, :, :], self.y[idx, self.indices, :]
 
 
-from wb.utils.args import Args, FSType
+from wb.utils.args import Args, FSType, FileType
 
 def dataset(args: Args):
     fs_type, path = args.data_dir
     file_type, filename = args._filetype()
     if fs_type == FSType.FILE:
-        train_dataset = FileWBDataset(
-            os.path.join(path, filename), 
-            train_flag=True, 
-            train_test_ratio=args.ratio_train_test
+
+        if file_type == FileType.PARQUET:
+            train_dataset = FileWBDataset(
+                os.path.join(path, filename), 
+                train_flag=True, 
+                train_test_ratio=args.ratio_train_test
+                )
+            test_dataset = FileWBDataset(
+                os.path.join(path, filename), 
+                train_flag=False, 
+                train_test_ratio=args.ratio_train_test
+                )
+        elif file_type == FileType.NUMPY:
+            train_dataset = NumpyWBDataset(
+                path,
+                train_flag=True,
+                indices = args.indices
             )
-        test_dataset = FileWBDataset(
-            os.path.join(path, filename), 
-            train_flag=False, 
-            train_test_ratio=args.ratio_train_test
+            test_dataset = NumpyWBDataset(
+                path,
+                train_flag=False,
+                indices = args.indices
             )
+        else:
+            raise Exception(f"unable to find the right Dataset Class for {fs_type} with {file_type}")
+
 
     return train_dataset, test_dataset
