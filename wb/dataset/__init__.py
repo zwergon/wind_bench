@@ -2,6 +2,7 @@ import os
 import glob
 import torch
 import numpy as np
+from io import BytesIO
 
 from torch.utils.data import Dataset
 import pyarrow.parquet as pq
@@ -52,7 +53,8 @@ class WBDataset(Dataset):
     def __init__(self, 
                  train_flag, 
                  train_test_ratio, 
-                 normalization
+                 normalization,
+                 indices
                  ):
        
         self.train_flag = train_flag
@@ -60,12 +62,17 @@ class WBDataset(Dataset):
         self.train = []
         self.test = []
         self.keys = []
+
+        if indices is None:
+            self.y_selected = self.y_columns
+        else:
+            self.y_selected = [self.y_columns[i] for i in indices]
         
         self.norma : Scaling = Scaling.create(
             normalization,
             WBDataset.stats, 
             self.x_columns, 
-            self.y_columns
+            self.y_selected
             )
        
     def __len__(self):
@@ -77,7 +84,7 @@ class WBDataset(Dataset):
 
     @property
     def output_size(self):
-        return len(self.y_columns)
+        return len(self.y_selected)
     
     def _split_train_test(self, keys: list):
         for _ in range(int(self.train_test_ratio*len(keys))):
@@ -96,11 +103,13 @@ class S3WBDataset(WBDataset):
                  parquet_file, 
                  train_flag=True, 
                  train_test_ratio=.8, 
-                 normalization="min_max"):
+                 normalization="min_max",
+                 indices = None):
         super(S3WBDataset, self).__init__(
             train_flag=train_flag, 
             train_test_ratio=train_test_ratio,
-            normalization=normalization
+            normalization=normalization,
+            indices = indices
             )
     
         keys = []
@@ -118,11 +127,11 @@ class S3WBDataset(WBDataset):
             table = pq.read_table(
                 f"{s3.bucket.name}/{key}", 
                 filesystem=s3.filesystem, 
-                columns=self.x_columns + self.y_columns
+                columns=self.x_columns + self.y_selected
                 )
 
         X = np.array(table.select(self.x_columns), dtype=np.float32)
-        y = np.array(table.select(self.y_columns), dtype=np.float32)
+        y = np.array(table.select(self.y_selected), dtype=np.float32)
         if self.norma is not None:
             self.norma.norm_x(X)
             self.norma.norm_y(y)
@@ -144,12 +153,14 @@ class FileWBDataset(WBDataset):
                 parquet_file, 
                 train_flag=True, 
                 train_test_ratio=.8, 
-                normalization="min_max"
+                normalization="min_max",
+                indices = None
                  ):
         super(FileWBDataset, self).__init__(
             train_flag=train_flag, 
             train_test_ratio=train_test_ratio,
-            normalization=normalization
+            normalization=normalization,
+            indices=indices
             )
 
         keys = []
@@ -162,11 +173,11 @@ class FileWBDataset(WBDataset):
         key = self.keys[idx]
         table = pq.read_table(
             key, 
-            columns=self.x_columns + self.y_columns
+            columns=self.x_columns + self.y_selected
             )
 
         X = np.array(table.select(self.x_columns), dtype=np.float32)
-        y = np.array(table.select(self.y_columns), dtype=np.float32)
+        y = np.array(table.select(self.y_selected), dtype=np.float32)
         if self.norma is not None:
             self.norma.norm_x(X)
             self.norma.norm_y(y)
@@ -182,11 +193,13 @@ class AzureDataset(WBDataset):
                  uri, 
                  train_flag=True, 
                  train_test_ratio=.8, 
-                normalization="min_max"):
+                normalization="min_max",
+                indices = None):
         super(AzureDataset, self).__init__(
             train_flag=train_flag, 
             train_test_ratio=train_test_ratio,
-            normalization=normalization)
+            normalization=normalization,
+            indices=indices)
 
         self.fs = AzureMachineLearningFileSystem(uri)
      
@@ -194,8 +207,68 @@ class AzureDataset(WBDataset):
         
         self._split_train_test(keys)
 
+
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
+
+class AzureBlobDataset(WBDataset):
    
+    def __init__(self, 
+                 container, 
+                 train_flag=True, 
+                 train_test_ratio=.8, 
+                normalization="min_max",
+                indices = None):
+        super(AzureBlobDataset, self).__init__(
+            train_flag=train_flag, 
+            train_test_ratio=train_test_ratio,
+            normalization=normalization,
+            indices=indices
+            )
+        
+        account_url = "https://mlparquetstorage.blob.core.windows.net"
+        self.container = container
+        credential = DefaultAzureCredential()
+
+        # Create the BlobServiceClient object
+        self.blob_service_client = BlobServiceClient(account_url, 
+                                                credential=credential, 
+                                                proxies={
+                                                    "http:": "http://irproxy:8082", 
+                                                    "https": "http://irproxy:8082"
+                                                    }
+                                                )
+     
+        keys = self._list_parquet_flat()
+        
+        self._split_train_test(keys)
+
+    def close(self):
+        self.blob_service_client.close()
+
+    def _list_parquet_flat(self):
+        with self.blob_service_client.get_container_client(container=self.container) as container_client:
+            files = [ blob for blob in container_client.list_blobs() if ".parquet" in blob.name ]
+
+        return files
     
+    def __getitem__(self, idx):
+        key = self.keys[idx]
+
+        with self.blob_service_client.get_blob_client(container=self.container, blob=key) as blob_client:
+            byte_stream = BytesIO()
+        
+            num_bytes = blob_client.download_blob().readinto(byte_stream)
+            table = pq.read_table(
+                byte_stream, 
+                columns=self.x_columns + self.y_selected)
+        
+        X = np.array(table.select(self.x_columns), dtype=np.float32)
+        y = np.array(table.select(self.y_selected), dtype=np.float32)
+        if self.norma is not None:
+            self.norma.norm_x(X)
+            self.norma.norm_y(y)
+        return X, y
 
 class NumpyWBDataset(Dataset):
     def __init__(self, root_path, train_flag=True, indices=None):
