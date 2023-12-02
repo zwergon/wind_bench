@@ -7,8 +7,8 @@
     "_file": "numpy",
     
     "file": "wind_bench.parquet",
-    "_root_path_file": "file:///home/azureuser/cloudfiles/code/wind_bench/tests/data/",
-    "root_path": "file:///home/jef/Documents/Projects/repositories/wind_bench/tests/data",
+    "root_path": "file:///home/azureuser/cloudfiles/code/wind_bench/tests/data/",
+    "_root_path_file": "file:///home/jef/Documents/Projects/repositories/wind_bench/tests/data",
     
     "ratio_train_test": 0.9,
     "sequence_length":128,

@@ -1,16 +1,11 @@
 import os
-import glob
-import torch
+
 import numpy as np
 import pandas as pd
-from io import BytesIO
 
 from torch.utils.data import Dataset
-import pyarrow.parquet as pq
 
-from wb.dataset.s3 import S3
-from wb.dataset.normalize import Scaling, MinMax
-from wb.utils.time_utils import Timer
+from wb.dataset.normalize import Scaling
 
 
 
@@ -98,48 +93,6 @@ class WBDataset(Dataset):
         else:
             self.keys = self.test
 
-
-class S3WBDataset(WBDataset):
-
-    def __init__(self, 
-                 parquet_file, 
-                 train_flag=True, 
-                 train_test_ratio=.8, 
-                 normalization="min_max",
-                 indices = None):
-        super(S3WBDataset, self).__init__(
-            train_flag=train_flag, 
-            train_test_ratio=train_test_ratio,
-            normalization=normalization,
-            indices = indices
-            )
-    
-        keys = []
-        with S3() as s3:
-            for obj in s3.bucket.objects.filter(Prefix=parquet_file):
-                keys.append(obj.key)
-
-        self._split_train_test(keys)
-
-    
-    def __getitem__(self, idx):
-        
-        key = self.keys[idx]
-        with S3() as s3:
-            table = pq.read_table(
-                f"{s3.bucket.name}/{key}", 
-                filesystem=s3.filesystem, 
-                columns=self.x_columns + self.y_selected
-                )
-
-        X = np.array(table.select(self.x_columns), dtype=np.float32)
-        y = np.array(table.select(self.y_selected), dtype=np.float32)
-        if self.norma is not None:
-            self.norma.norm_x(X)
-            self.norma.norm_y(y)
-        return X, y
-    
-
 class FileWBDataset(WBDataset):
 
     @staticmethod
@@ -213,20 +166,86 @@ class AzureMLDataset(WBDataset):
         key = self.keys[idx]
 
         with self.fs.open(key) as f:
-            table = pq.read_table(f, 
+            df = pd.read_parquet(f, 
                     columns=self.x_columns + self.y_selected
                     )
-            
-
-        X = np.array(table.select(self.x_columns), dtype=np.float32)
-        y = np.array(table.select(self.y_selected), dtype=np.float32)
+        
+        X = df.loc[:, self.x_columns].transpose().to_numpy(dtype=np.float32)
+        y = df.loc[:, self.y_selected].transpose().to_numpy(dtype=np.float32)
         if self.norma is not None:
             self.norma.norm_x(X)
             self.norma.norm_y(y)
         return X, y
     
 
+class NumpyWBDataset(Dataset):
+    def __init__(self, root_path, train_flag=True, indices=None):
 
+        name = "train" if train_flag else "test"
+        
+
+        x_name = os.path.join(root_path, f"{name}_data.npy")
+        y_name = os.path.join(root_path, f"{name}_labels.npy")
+        self.X = np.load(x_name).astype(np.float32)
+        self.y = np.load(y_name).astype(np.float32)
+
+        if indices is None:
+            self.indices = list(range(self.y.shape[1]))
+        else:
+            self.indices = indices
+        
+    def __len__(self):
+        return self.X.shape[0]
+    
+    @property
+    def input_size(self):
+        return self.X.shape[1]
+    
+    @property
+    def output_size(self):
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        return self.X[idx, :, :], self.y[idx, self.indices, :]
+
+
+
+from wb.utils.args import Args, FSType, FileType
+
+def dataset(args: Args):
+    fs_type, path = args.data_dir
+    file_type, filename = args._filetype()
+    if fs_type == FSType.FILE:
+
+        if file_type == FileType.PARQUET:
+            train_dataset = FileWBDataset(
+                os.path.join(path, filename), 
+                train_flag=True, 
+                train_test_ratio=args.ratio_train_test,
+                indices=args.indices
+                )
+            test_dataset = FileWBDataset(
+                os.path.join(path, filename), 
+                train_flag=False, 
+                train_test_ratio=args.ratio_train_test,
+                indices=args.indices
+                )
+        elif file_type == FileType.NUMPY:
+            train_dataset = NumpyWBDataset(
+                path,
+                train_flag=True,
+                indices = args.indices
+            )
+            test_dataset = NumpyWBDataset(
+                path,
+                train_flag=False,
+                indices = args.indices
+            )
+        else:
+            raise Exception(f"unable to find the right Dataset Class for {fs_type} with {file_type}")
+
+
+    return train_dataset, test_dataset
 
 # from azure.identity import DefaultAzureCredential
 # from azure.storage.blob import BlobServiceClient
@@ -290,70 +309,47 @@ class AzureMLDataset(WBDataset):
 #             self.norma.norm_y(y)
 #         return X, y
 
-class NumpyWBDataset(Dataset):
-    def __init__(self, root_path, train_flag=True, indices=None):
 
-        name = "train" if train_flag else "test"
-        
 
-        x_name = os.path.join(root_path, f"{name}_data.npy")
-        y_name = os.path.join(root_path, f"{name}_labels.npy")
-        self.X = np.load(x_name).astype(np.float32)
-        self.y = np.load(y_name).astype(np.float32)
 
-        if indices is None:
-            self.indices = list(range(self.y.shape[1]))
-        else:
-            self.indices = indices
-        
-    def __len__(self):
-        return self.X.shape[0]
+# class S3WBDataset(WBDataset):
+
+#     def __init__(self, 
+#                  parquet_file, 
+#                  train_flag=True, 
+#                  train_test_ratio=.8, 
+#                  normalization="min_max",
+#                  indices = None):
+#         super(S3WBDataset, self).__init__(
+#             train_flag=train_flag, 
+#             train_test_ratio=train_test_ratio,
+#             normalization=normalization,
+#             indices = indices
+#             )
     
-    @property
-    def input_size(self):
-        return self.X.shape[1]
+#         keys = []
+#         with S3() as s3:
+#             for obj in s3.bucket.objects.filter(Prefix=parquet_file):
+#                 keys.append(obj.key)
+
+#         self._split_train_test(keys)
+
     
-    @property
-    def output_size(self):
-        return len(self.indices)
+#     def __getitem__(self, idx):
+        
+#         key = self.keys[idx]
+#         with S3() as s3:
+#             ## TODO Warning order may be false when casting to np.array just below !!!!
+#             table = pq.read_table(
+#                 f"{s3.bucket.name}/{key}", 
+#                 filesystem=s3.filesystem, 
+#                 columns=self.x_columns + self.y_selected
+#                 )
 
-    def __getitem__(self, idx):
-        return self.X[idx, :, :], self.y[idx, self.indices, :]
-
-
-from wb.utils.args import Args, FSType, FileType
-
-def dataset(args: Args):
-    fs_type, path = args.data_dir
-    file_type, filename = args._filetype()
-    if fs_type == FSType.FILE:
-
-        if file_type == FileType.PARQUET:
-            train_dataset = FileWBDataset(
-                os.path.join(path, filename), 
-                train_flag=True, 
-                train_test_ratio=args.ratio_train_test,
-                indices=args.indices
-                )
-            test_dataset = FileWBDataset(
-                os.path.join(path, filename), 
-                train_flag=False, 
-                train_test_ratio=args.ratio_train_test,
-                indices=args.indices
-                )
-        elif file_type == FileType.NUMPY:
-            train_dataset = NumpyWBDataset(
-                path,
-                train_flag=True,
-                indices = args.indices
-            )
-            test_dataset = NumpyWBDataset(
-                path,
-                train_flag=False,
-                indices = args.indices
-            )
-        else:
-            raise Exception(f"unable to find the right Dataset Class for {fs_type} with {file_type}")
-
-
-    return train_dataset, test_dataset
+#         X = np.array(table.select(self.x_columns), dtype=np.float32)
+#         y = np.array(table.select(self.y_selected), dtype=np.float32)
+#         if self.norma is not None:
+#             self.norma.norm_x(X)
+#             self.norma.norm_y(y)
+#         return X, y
+    
