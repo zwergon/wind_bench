@@ -4,7 +4,7 @@ import torch
 
 from wb.dataset.dataloader import NaiveDataLoader
 from wb.utils.time_utils import Timer
-from wb.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset, AzureBlobDataset, AzureMLDataset
+from wb.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset, AzureMLDataset
 
 
 class TestDataset(unittest.TestCase):

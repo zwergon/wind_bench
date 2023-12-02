@@ -2,12 +2,13 @@
     "project": "wb_virtual",
     "n_samples": 100,
     "normalization": true,
-    "_root_path_file": "file://D:/lecomtje/Repositories/MPU/data/wb",
+   
     "_root_path_azure": "azureml://subscriptions/239dc480-600f-413c-ae8c-8a5bbc17ed87/resourcegroups/rg-ml-jef/workspaces/mltry/datastores/workspaceblobstore/paths/LocalUpload/e371ee7f73e78305a4dda0ecbf7ff7c9",
     "_file": "numpy",
     
     "file": "wind_bench.parquet",
-    "root_path": "file:///home/azureuser/cloudfiles/code/wind_bench/tests/data/",
+    "_root_path_file": "file:///home/azureuser/cloudfiles/code/wind_bench/tests/data/",
+    "root_path": "file:///home/jef/Documents/Projects/repositories/wind_bench/tests/data",
     
     "ratio_train_test": 0.9,
     "sequence_length":128,

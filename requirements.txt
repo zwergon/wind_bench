@@ -6,3 +6,9 @@ pandas
 numba
 tqdm
 matplotlib
+psutil
+azureml
+azureml-core
+azureml-fsspec
+mlflow
+scikit-learn

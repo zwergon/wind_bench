@@ -2,6 +2,7 @@ import os
 import glob
 import torch
 import numpy as np
+import pandas as pd
 from io import BytesIO
 
 from torch.utils.data import Dataset
@@ -74,6 +75,7 @@ class WBDataset(Dataset):
             self.x_columns, 
             self.y_selected
             )
+        
        
     def __len__(self):
         return len(self.keys)
@@ -171,13 +173,13 @@ class FileWBDataset(WBDataset):
 
     def __getitem__(self, idx):
         key = self.keys[idx]
-        table = pq.read_table(
+        df = pd.read_parquet(
             key, 
             columns=self.x_columns + self.y_selected
             )
-
-        X = np.array(table.select(self.x_columns), dtype=np.float32)
-        y = np.array(table.select(self.y_selected), dtype=np.float32)
+        
+        X = df.loc[:, self.x_columns].transpose().to_numpy(dtype=np.float32)
+        y = df.loc[:, self.y_selected].transpose().to_numpy(dtype=np.float32)
         if self.norma is not None:
             self.norma.norm_x(X)
             self.norma.norm_y(y)
@@ -226,67 +228,67 @@ class AzureMLDataset(WBDataset):
 
 
 
-from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient
+# from azure.identity import DefaultAzureCredential
+# from azure.storage.blob import BlobServiceClient
 
-class AzureBlobDataset(WBDataset):
+# class AzureBlobDataset(WBDataset):
    
-    def __init__(self, 
-                 container, 
-                 train_flag=True, 
-                 train_test_ratio=.8, 
-                normalization="min_max",
-                indices = None):
-        super(AzureBlobDataset, self).__init__(
-            train_flag=train_flag, 
-            train_test_ratio=train_test_ratio,
-            normalization=normalization,
-            indices=indices
-            )
+#     def __init__(self, 
+#                  container, 
+#                  train_flag=True, 
+#                  train_test_ratio=.8, 
+#                 normalization="min_max",
+#                 indices = None):
+#         super(AzureBlobDataset, self).__init__(
+#             train_flag=train_flag, 
+#             train_test_ratio=train_test_ratio,
+#             normalization=normalization,
+#             indices=indices
+#             )
         
-        account_url = "azureml://subscriptions/8a889cf2-7b3d-4003-824e-b503f56604b0/resourcegroups/rg-jef-ml/workspaces/ml-gpu/datastores/workspaceblobstore/paths/UI/2023-11-29_114659_UTC/wind_bench.parquet"
-        self.container = container
-        credential = DefaultAzureCredential()
+#         account_url = "azureml://subscriptions/8a889cf2-7b3d-4003-824e-b503f56604b0/resourcegroups/rg-jef-ml/workspaces/ml-gpu/datastores/workspaceblobstore/paths/UI/2023-11-29_114659_UTC/wind_bench.parquet"
+#         self.container = container
+#         credential = DefaultAzureCredential()
 
-        # Create the BlobServiceClient object
-        self.blob_service_client = BlobServiceClient(account_url, 
-                                                credential=credential #, 
-                                                # proxies={
-                                                #     "http:": "http://irproxy:8082", 
-                                                #     "https": "http://irproxy:8082"
-                                                #     }
-                                                )
+#         # Create the BlobServiceClient object
+#         self.blob_service_client = BlobServiceClient(account_url, 
+#                                                 credential=credential #, 
+#                                                 # proxies={
+#                                                 #     "http:": "http://irproxy:8082", 
+#                                                 #     "https": "http://irproxy:8082"
+#                                                 #     }
+#                                                 )
      
-        keys = self._list_parquet_flat()
+#         keys = self._list_parquet_flat()
         
-        self._split_train_test(keys)
+#         self._split_train_test(keys)
 
-    def close(self):
-        self.blob_service_client.close()
+#     def close(self):
+#         self.blob_service_client.close()
 
-    def _list_parquet_flat(self):
-        with self.blob_service_client.get_container_client(container=self.container) as container_client:
-            files = [ blob for blob in container_client.list_blobs() if ".parquet" in blob.name ]
+#     def _list_parquet_flat(self):
+#         with self.blob_service_client.get_container_client(container=self.container) as container_client:
+#             files = [ blob for blob in container_client.list_blobs() if ".parquet" in blob.name ]
 
-        return files
+#         return files
     
-    def __getitem__(self, idx):
-        key = self.keys[idx]
+#     def __getitem__(self, idx):
+#         key = self.keys[idx]
 
-        with self.blob_service_client.get_blob_client(container=self.container, blob=key) as blob_client:
-            byte_stream = BytesIO()
+#         with self.blob_service_client.get_blob_client(container=self.container, blob=key) as blob_client:
+#             byte_stream = BytesIO()
         
-            num_bytes = blob_client.download_blob().readinto(byte_stream)
-            table = pq.read_table(
-                byte_stream, 
-                columns=self.x_columns + self.y_selected)
+#             num_bytes = blob_client.download_blob().readinto(byte_stream)
+#             table = pq.read_table(
+#                 byte_stream, 
+#                 columns=self.x_columns + self.y_selected)
         
-        X = np.array(table.select(self.x_columns), dtype=np.float32)
-        y = np.array(table.select(self.y_selected), dtype=np.float32)
-        if self.norma is not None:
-            self.norma.norm_x(X)
-            self.norma.norm_y(y)
-        return X, y
+#         X = np.array(table.select(self.x_columns), dtype=np.float32)
+#         y = np.array(table.select(self.y_selected), dtype=np.float32)
+#         if self.norma is not None:
+#             self.norma.norm_x(X)
+#             self.norma.norm_y(y)
+#         return X, y
 
 class NumpyWBDataset(Dataset):
     def __init__(self, root_path, train_flag=True, indices=None):
@@ -330,12 +332,14 @@ def dataset(args: Args):
             train_dataset = FileWBDataset(
                 os.path.join(path, filename), 
                 train_flag=True, 
-                train_test_ratio=args.ratio_train_test
+                train_test_ratio=args.ratio_train_test,
+                indices=args.indices
                 )
             test_dataset = FileWBDataset(
                 os.path.join(path, filename), 
                 train_flag=False, 
-                train_test_ratio=args.ratio_train_test
+                train_test_ratio=args.ratio_train_test,
+                indices=args.indices
                 )
         elif file_type == FileType.NUMPY:
             train_dataset = NumpyWBDataset(

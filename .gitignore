@@ -1,6 +1,6 @@
 __pycache__
 *.egg-info
-venvv
+venv
 tb-logger
 */__pycache__
 */*/__pycache__
