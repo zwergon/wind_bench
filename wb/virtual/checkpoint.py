@@ -13,6 +13,10 @@ class CheckPoint:
     def state_dict(self):
         return self.params['model_state_dict']
 
+    @property
+    def kind(self):
+        return self.params['kind']
+
 
     @staticmethod
     def load(checkpoint_path: str):

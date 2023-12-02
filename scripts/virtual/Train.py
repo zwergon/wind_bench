@@ -24,8 +24,7 @@ if __name__ == "__main__":
     #INPUT Parameters
     args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
 
-    logger = Logger()
-    logger.init(task_name=args.name, config=args.__dict__)
+    logger = Logger(args.__dict__)
 
     checkpoint = CheckPoint(".", args.type)
 
@@ -73,3 +72,5 @@ if __name__ == "__main__":
 
 
     train_test(conf, model, train_loader, test_loader, context)
+
+    logger.close()

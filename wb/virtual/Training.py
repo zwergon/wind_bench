@@ -34,7 +34,7 @@ def train_test(config, model, train_loader, test_loader, context: dict):
 
     num_epochs = cf["epoch"]
 
-    logger.summary(cf, device, train_loader, test_loader)
+    logger.summary(device, train_loader, test_loader)
 
     
     optimizer = optim.Adam(
@@ -43,8 +43,6 @@ def train_test(config, model, train_loader, test_loader, context: dict):
             weight_decay=cf['weight_decay']
             )
 
-    #scheduler = lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.99)
-    #scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=5, eta_min=0)
     scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
     for epoch in range(num_epochs):
@@ -128,26 +126,15 @@ def train_test(config, model, train_loader, test_loader, context: dict):
             with torch.no_grad():
                 predicted = model(inputs)
 
-            logger.report_predict(
-                epoch, 
-                actual[index, 0, :].detach().cpu().numpy(), 
-                predicted[index, 0, :].detach().cpu().numpy(),
-                actual[index, 1, :].detach().cpu().numpy(), 
-                predicted[index, 1, :].detach().cpu().numpy(),
-                actual[index, 2, :].detach().cpu().numpy(), 
-                predicted[index, 2, :].detach().cpu().numpy(),
-                actual[index, 3, :].detach().cpu().numpy(), 
-                predicted[index, 3, :].detach().cpu().numpy(),
-                actual[index, 4, :].detach().cpu().numpy(), 
-                predicted[index, 4, :].detach().cpu().numpy(),
-                actual[index, 5, :].detach().cpu().numpy(), 
-                predicted[index, 5, :].detach().cpu().numpy(),
-                offset)
             
             checkpoint.save(epoch=epoch, model=model, optimizer=optimizer, loss=test_loss)
 
-            
-        logger.report_loss(epoch, train_loss, test_loss, mae_train, mae_test, cf, lr, r2_train, r2_test)
+        losses = {
+            "Loss": (train_loss, test_loss), 
+            "MAE": (mae_train.item(), mae_test.item()),
+            "F2": (r2_train.item(), r2_test.item())
+        }
+        logger.report_loss(epoch, losses)
 
 
 """    
