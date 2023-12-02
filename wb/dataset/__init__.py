@@ -187,7 +187,7 @@ class FileWBDataset(WBDataset):
 from azureml.fsspec import AzureMachineLearningFileSystem
 
 
-class AzureDataset(WBDataset):
+class AzureMLDataset(WBDataset):
    
     def __init__(self, 
                  uri, 
@@ -195,7 +195,7 @@ class AzureDataset(WBDataset):
                  train_test_ratio=.8, 
                 normalization="min_max",
                 indices = None):
-        super(AzureDataset, self).__init__(
+        super(AzureMLDataset, self).__init__(
             train_flag=train_flag, 
             train_test_ratio=train_test_ratio,
             normalization=normalization,
@@ -206,6 +206,24 @@ class AzureDataset(WBDataset):
         keys = self.fs.glob("**/*.parquet")
         
         self._split_train_test(keys)
+
+    def __getitem__(self, idx):
+        key = self.keys[idx]
+
+        with self.fs.open(key) as f:
+            table = pq.read_table(f, 
+                    columns=self.x_columns + self.y_selected
+                    )
+            
+
+        X = np.array(table.select(self.x_columns), dtype=np.float32)
+        y = np.array(table.select(self.y_selected), dtype=np.float32)
+        if self.norma is not None:
+            self.norma.norm_x(X)
+            self.norma.norm_y(y)
+        return X, y
+    
+
 
 
 from azure.identity import DefaultAzureCredential
@@ -226,17 +244,17 @@ class AzureBlobDataset(WBDataset):
             indices=indices
             )
         
-        account_url = "https://mlparquetstorage.blob.core.windows.net"
+        account_url = "azureml://subscriptions/8a889cf2-7b3d-4003-824e-b503f56604b0/resourcegroups/rg-jef-ml/workspaces/ml-gpu/datastores/workspaceblobstore/paths/UI/2023-11-29_114659_UTC/wind_bench.parquet"
         self.container = container
         credential = DefaultAzureCredential()
 
         # Create the BlobServiceClient object
         self.blob_service_client = BlobServiceClient(account_url, 
-                                                credential=credential, 
-                                                proxies={
-                                                    "http:": "http://irproxy:8082", 
-                                                    "https": "http://irproxy:8082"
-                                                    }
+                                                credential=credential #, 
+                                                # proxies={
+                                                #     "http:": "http://irproxy:8082", 
+                                                #     "https": "http://irproxy:8082"
+                                                #     }
                                                 )
      
         keys = self._list_parquet_flat()

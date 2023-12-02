@@ -16,6 +16,7 @@ class TestArgs(unittest.TestCase):
         print(args.type)
         print(args.data_dir)
         print(args.name)
+        self.assertTrue(args is not None)
 
 if __name__ == "__main__":
     unittest.main()

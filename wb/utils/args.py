@@ -19,6 +19,7 @@ class Args:
     def __init__(self, jsonname) -> None:
         with open(jsonname, 'r') as file:
             self.__dict__ = json.load(file)
+        self.dirname = os.path.dirname(jsonname)
 
    
 
@@ -28,6 +29,8 @@ class Args:
 
         if idx >= 0:
             path = self.root_path[7:]
+            if path[0] == '.':
+                path = path.replace(".", self.dirname)
             fs_type = FSType.FILE
         else:
             idx = self.root_path.find("azureml://")

@@ -2,25 +2,22 @@ import unittest
 import os
 import torch
 
-from wb.dataset import S3WBDataset, FileWBDataset, NumpyWBDataset
+from wb.dataset import dataset
 from wb.virtual.models import get_model
-from args import Args
+from wb.utils.args import Args
 
-class TestDataset(unittest.TestCase):
+class TestModel(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.args = Args(os.path.join(os.path.dirname(__file__), "args.json"))
-        self.args.root_path = os.path.join(os.path.dirname(__file__), "data")
-        
+         
     def test_cnn(self):
-        dataset = NumpyWBDataset(os.path.abspath(self.args.data_dir))
-        X, y = dataset[0]
+        train_dataset, _ = dataset(self.args)
+        X, y = train_dataset[0]
         print(X.shape, y.shape)
 
-        
-
-        model =  get_model(dataset.input_size, dataset.output_size, self.args.__dict__ )
+        model =  get_model(train_dataset.input_size, train_dataset.output_size, self.args.__dict__ )
         print(model)
 
 

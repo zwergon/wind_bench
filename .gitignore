@@ -12,3 +12,4 @@ tb-logger
 checkpoint*.pth
 mlruns
 azcopy*
+**/*.amltmp

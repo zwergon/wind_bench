@@ -56,6 +56,7 @@ def download_split(root_path, parquet_file, n_items, split):
                     tokens = obj.key.split('/')
 
                     file_directory = os.path.join(wb_path, f"{tokens[1]}.{i}")
+                    print(file_directory)
                     os.makedirs(file_directory, exist_ok=True)
                     sub_table = table.slice(i*split, split)
                     pq.write_to_dataset(sub_table, root_path=file_directory)
