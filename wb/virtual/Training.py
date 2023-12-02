@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from ray import tune
 from torch import nn
 
 import torch.optim as optim
@@ -10,7 +9,12 @@ from wb.virtual.loss_function import get_loss
 import matplotlib.pyplot as plt
 from torch.optim import lr_scheduler
 
-from ray.air import  session
+try:
+    from ray import tune
+    from ray.air import  session
+except ImportError:
+    print("ray is not installed... set tune to False in args.json ")
+
 
 from sklearn.metrics import r2_score
 

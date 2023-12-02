@@ -6,15 +6,15 @@
     "_root_path_azure": "azureml://subscriptions/239dc480-600f-413c-ae8c-8a5bbc17ed87/resourcegroups/rg-ml-jef/workspaces/mltry/datastores/workspaceblobstore/paths/LocalUpload/e371ee7f73e78305a4dda0ecbf7ff7c9",
     "_file": "wind_bench.parquet",
     
-    "root_path": "file://D:/work/wb-dataset/normalize_data",
+    "root_path": "file://D:/lecomtje/Repositories/MPU/data/wb",
     "file": "numpy",
     
     "ratio_train_test": 0.9,
-    "sequence_length":12000,
+    "sequence_length":1024,
     "num_workers": 2,
 
     "type": "LSTM",
-    "indices": [0, 1, 2, 3, 4, 5],
+    "indices": [3],
     "hidden_size": 20, 
     "num_layers": 2, 
     "kernel_size": 5,
@@ -28,6 +28,7 @@
     "loss":"MSE",
     "alpha":0.3,
     "gamma":0.005,
-    "tune": false
+    "tune": false,
+    "checkpoint": "D:/lecomtje/Repositories/MPU/wb-virtual/checkpoint_LSTM_300_0.00.pth"
 
 }

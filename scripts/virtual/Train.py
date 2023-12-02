@@ -3,8 +3,12 @@ import torch
 from torch.utils.data import DataLoader
 
 from wb.dataset import dataset
-import ray
-from ray import tune
+try:
+    import ray
+    from ray import tune
+except ImportError:
+    print("ray is not installed... set tune to False in args.json ")
+
 from functools import partial
 
 from wb.virtual.models import get_model
@@ -27,15 +31,14 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-      #conf ray_tune
-    conf={
-    "learning_rate":tune.loguniform(1e-4, 1e-1),
-    "weight_decay": tune.loguniform(3e-5, 1e-1),
-    #"alpha":0.3,
-    #"gamma":0.005
-    } 
-  
-
+    conf = {}
+    if args.tune:
+        #conf ray_tune
+        conf["learning_rate"] = tune.loguniform(1e-4, 1e-1)
+        conf[ "weight_decay"] = tune.loguniform(3e-5, 1e-1)
+            #"alpha":0.3,
+            #"gamma":0.005
+        
     train_dataset, test_dataset = dataset(args)
    
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -56,10 +59,16 @@ if __name__ == "__main__":
 
 
     
-    if args.tune == True:
+    if args.tune:
         ray.init(num_gpus=1)
-        result = tune.run(partial(train_test, model=model, train_loader=train_loader, test_loader=test_loader, context=context),
-                       config=conf, num_samples=20, metric="r2_score", mode="max",resources_per_trial={"cpu": 1, "gpu": 1})
+        result = tune.run(
+            partial(train_test, model=model, train_loader=train_loader, test_loader=test_loader, context=context),
+            config=conf, 
+            num_samples=20, 
+            metric="r2_score", 
+            mode="max",
+            resources_per_trial={"cpu": 1, "gpu": 1}
+            )
         print(f"Best config: {result.get_best_config()}")
 
 

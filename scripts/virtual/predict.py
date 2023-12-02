@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from wb.virtual.models import get_model
-from wb.dataset import NumpyWBDataset
+from wb.dataset import dataset
 
-from args import Args
-
+from wb.utils.args import Args
+from wb.virtual.checkpoint import CheckPoint
 
 def get_all_predicted(model, test_loader, y_test):
         all_outputs = []
@@ -44,16 +44,9 @@ def get_one_output(model, test_loader, index):
 
 def get_state_dict(args):
 
-        if "state_dict" in args.__dict__: 
-                params = torch.load(os.path.join(args.data_dir, args.state_dict))
-                if ".ckpt" in args.state_dict:
-                        state_dict = {key.replace("model.", ""): val for key, val in params['state_dict'].items()}
-                else:
-                        state_dict = params
-        else:
-                state_dict = torch.load(os.path.join(args.data_dir, f"model_{args.type.lower()}.pth"))
+        checkpoint = CheckPoint.load(args.checkpoint)
        
-        return state_dict
+        return checkpoint.state_dict
 
 if __name__ == "__main__":
 
@@ -63,7 +56,7 @@ if __name__ == "__main__":
         args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
 
 
-        test_dataset = NumpyWBDataset(args.data_dir, train_flag=False, indices=args.indices)
+        _, test_dataset = dataset(args)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
         
         X_test, y_test = next(iter(test_loader))
