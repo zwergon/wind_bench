@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 from wb.dataset.s3 import S3
 from wb.dataset import WBDataset
-from wb.utils.args import Args
+from wb.utils.config import Config
 from tqdm import tqdm
 
 
@@ -53,11 +53,11 @@ def download_split(parquet_file, n_items, split):
 
 if __name__ == "__main__":
 
-    args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
+    config = Config(jsonname = os.path.join(os.path.dirname(__file__), "config.json"))
 
-    data = download_split(args.s3_file, args.n_samples, args.sequence_length)
+    data = download_split(config.s3_file, config.n_samples, config.sequence_length)
 
-    if args.normalization:    
+    if config.normalization:    
         min = np.min(data, axis=(0,1))
         max = np.max(data, axis=(0,1))
         for i in range(data.shape[0]):
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(
         data[:,:,:-idx_y], 
         data[:,:,-idx_y:], 
-        test_size=args.ratio_train_test, 
+        test_size=config.ratio_train_test, 
         random_state=42
         )
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # Save train and test sets to separate files
     # Enregistrer les données d'entraînement
 
-    out_dir = args.data_dir
+    out_dir = config.data_dir
     os.makedirs(out_dir, exist_ok=True)
     np.save(os.path.join(out_dir, f'train_data.npy'), X_train)
     np.save(os.path.join(out_dir, f'train_labels.npy'), y_train)

@@ -6,22 +6,22 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from wb.dataset import dataset
 
-from wb.utils.args import Args
+from wb.utils.config import Config
 
 if __name__ == "__main__":
-    args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
+    config = Config(jsonname = os.path.join(os.path.dirname(__file__), "config.json"))
 
-    dataset, _ = dataset(args)
+    dataset, _ = dataset(config)
         
     print(f"train dataset (size) {len(dataset)}")
 
-    X_idx, y_idx = dataset[args.indices[0]]
+    X_idx, y_idx = dataset[config.indices[0]]
 
     print(f"X_test : {X_idx.shape}")
     print(f"y_test : {y_idx.shape}")
 
     fig, (ax1, ax2) = plt.subplots(2, 1)
-    fig.suptitle( f"X (solid) versus y (dash) for idx:{args.indices[0]}")
+    fig.suptitle( f"X (solid) versus y (dash) for idx:{config.indices[0]}")
 
     print(X_idx.shape, y_idx.shape)
     for i in range(X_idx.shape[0]):

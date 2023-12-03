@@ -1,44 +1,78 @@
 
+
+import os
+import torch
+import uuid
+import mlflow
+import tempfile
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-import os
-import mlflow
+from wb.utils.config import Config
+from wb.virtual.checkpoint import CheckPoint
 
 
 
-class Logger:
+class Context:
 
-    def __init__(self, config: dict) -> None:
-        self.logger = None
-        self.config = config
-        path =  "/tmp/mlrun"
-        mlflow.set_tracking_uri(f"file://{path}")
-        experiment_id = mlflow.create_experiment(
-            "Social NLP Experiments",
-            artifact_location=path
-            )
-        experiment = mlflow.get_experiment(experiment_id)
-        print(f"Name: {experiment.name}")
-        print(f"Experiment_id: {experiment.experiment_id}")
-        print(f"Artifact Location: {experiment.artifact_location}")
+    @staticmethod
+    def _experiment_name(root_name):
+        return f"{root_name}_{str(uuid.uuid1())[:8]}"
+
+    def __init__(self, config: Config) -> None:
+        self._config = config
+
+        self.checkpoint = CheckPoint()
+
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
-        mlflow.start_run(experiment_id=experiment.experiment_id)
+        mlflow.set_tracking_uri(config.tracking_uri)
+        self.experiment_id = mlflow.create_experiment(self._experiment_name(config.project))
+        
+    def __enter__(self):
+        mlflow.start_run(experiment_id=self.experiment_id)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    @property
+    def config(self):
+        return self._config.__dict__
 
     def close(self):
         mlflow.end_run()
         
-    def summary(self, device, train_loader, test_loader):
-        print(f"Device : {device}")
+    def summary(self, train_loader, test_loader):
+        print(f"Device : {self.device}")
+        experiment = mlflow.get_experiment(self.experiment_id)
+        print(f"Name: {experiment.name}")
+        print(f"Experiment_id: {experiment.experiment_id}")
+        print(f"Artifact Location: {experiment.artifact_location}")
+        print(f"Type Network: {self._config.type}")
         X_train, y_train = next(iter(train_loader))
         X_test, y_test = next(iter(test_loader))
         print(f"X_train : {X_train.shape}")
         print(f"y_train : {y_train.shape}")
         print(f"X_test : {X_test.shape}")
         print(f"y_test : {y_test.shape}") 
-        print(f"Type Network: {self.config['type']}")
 
+
+    def save_checkpoint(self, epoch, model, optimizer, loss):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            ckp_name = os.path.join(tmpdirname, f"checkpoint_{epoch}_{loss:.2f}.pth")
+            self.checkpoint.save(
+                            ckp_name,
+                            epoch=epoch, 
+                            model=model, 
+                            optimizer=optimizer, 
+                            loss=loss
+                            )
         
+            mlflow.log_artifact(local_path=ckp_name, artifact_path="checkpoints")
+
 
     def report_loss(self, epoch, losses:dict):
         num_epochs = self.config['epoch']
@@ -49,7 +83,13 @@ class Logger:
         if epoch % 10 == 0:
             print(f"Epoch {epoch}/{num_epochs}")
             for loss in losses.keys():
-                print(f"train_{loss}: {losses[loss][0]}, test_{loss}: {losses[loss][1]}")
+                print(f"{loss} - train: {losses[loss][0]}, test: {losses[loss][1]}")
+
+    def report_prediction(self, predictions: list):
+        for p in predictions:
+            fig = p.plot()
+            mlflow.log_figure(fig, p.file)
+            plt.close(fig)
         
     # def report_predict(self, epoch, mud_x, pred_mud_x, mud_y, pred_mud_y, mud_z, pred_mud_z, 
     #                    wat_x, pred_wat_x, wat_y, pred_wat_y, wat_z, pred_wat_z, offset=0):

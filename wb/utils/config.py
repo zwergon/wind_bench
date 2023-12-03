@@ -14,7 +14,7 @@ class FileType(IntEnum):
     PARQUET=1
 
 
-class Args:
+class Config:
 
     def __init__(self, jsonname) -> None:
         with open(jsonname, 'r') as file:

@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 from wb.utils.time_utils import Timer
 from wb.dataset.s3 import S3
 
-from wb.utils.args import Args
+from wb.utils.config import Config
 
 
 def download_s3(root_path, parquet_file, n_items):
@@ -70,14 +70,14 @@ def download_split(root_path, parquet_file, n_items, split):
 
 if __name__ == "__main__":
 
-    args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
+    config = Config(jsonname = os.path.join(os.path.dirname(__file__), "config.json"))
 
-    fs_type, path = args.data_dir
+    fs_type, path = config.data_dir
     download_split(
         root_path=path, 
-        parquet_file=args.s3_file, 
-        n_items=args.n_samples,
-        split = args.sequence_length)
+        parquet_file=config.s3_file, 
+        n_items=config.n_samples,
+        split = config.sequence_length)
         
 
 

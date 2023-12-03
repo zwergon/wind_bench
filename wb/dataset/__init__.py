@@ -210,9 +210,9 @@ class NumpyWBDataset(Dataset):
 
 
 
-from wb.utils.args import Args, FSType, FileType
+from wb.utils.config import Config, FSType, FileType
 
-def dataset(args: Args):
+def dataset(args: Config):
     fs_type, path = args.data_dir
     file_type, filename = args._filetype()
     if fs_type == FSType.FILE:

@@ -4,20 +4,20 @@ import torch
 
 from wb.dataset import dataset
 from wb.virtual.models import get_model
-from wb.utils.args import Args
+from wb.utils.config import Config
 
 class TestModel(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.args = Args(os.path.join(os.path.dirname(__file__), "args.json"))
+        self.config = Config(os.path.join(os.path.dirname(__file__), "config.json"))
          
     def test_cnn(self):
-        train_dataset, _ = dataset(self.args)
+        train_dataset, _ = dataset(self.config)
         X, y = train_dataset[0]
         print(X.shape, y.shape)
 
-        model =  get_model(train_dataset.input_size, train_dataset.output_size, self.args.__dict__ )
+        model =  get_model(train_dataset.input_size, train_dataset.output_size, self.config.__dict__ )
         print(model)
 
 

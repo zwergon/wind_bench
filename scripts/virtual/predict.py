@@ -7,7 +7,7 @@ import numpy as np
 from wb.virtual.models import get_model
 from wb.dataset import dataset
 
-from wb.utils.args import Args
+from wb.utils.config import Config
 from wb.virtual.checkpoint import CheckPoint
 
 def get_all_predicted(model, test_loader, y_test):
@@ -53,10 +53,10 @@ if __name__ == "__main__":
         offset = 10
         index = 0
 
-        args = Args(jsonname = os.path.join(os.path.dirname(__file__), "args.json"))
+        config = Config(jsonname = os.path.join(os.path.dirname(__file__), "config.json"))
 
 
-        _, test_dataset = dataset(args)
+        _, test_dataset = dataset(config)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
         
         X_test, y_test = next(iter(test_loader))
@@ -64,9 +64,9 @@ if __name__ == "__main__":
         print(f"y_test : {y_test.shape}")
     
 
-        print(f"Type Network: {args.type}")
-        model = get_model(test_dataset.input_size, test_dataset.output_size, args.__dict__)
-        model.load_state_dict(get_state_dict(args))
+        print(f"Type Network: {config.type}")
+        model = get_model(test_dataset.input_size, test_dataset.output_size, config.__dict__)
+        model.load_state_dict(get_state_dict(config))
 
         #real_outputs, predicted_outputs = get_all_predicted(model, test_loader, y_test)
         real_outputs, predicted_outputs = get_one_output(model, test_loader, index)
