@@ -27,10 +27,13 @@ class Context:
         self.checkpoint = CheckPoint()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
-        mlflow.set_tracking_uri(config.tracking_uri)
-        self.experiment_id = mlflow.create_experiment(self._experiment_name(config.project))
-        
+
+        if config.tracking_uri:
+            mlflow.set_tracking_uri(config.tracking_uri)
+            self.experiment_id = mlflow.create_experiment(self._experiment_name(config.project))
+        else:
+            self.experiment_id = None
+
     def __enter__(self):
         mlflow.start_run(experiment_id=self.experiment_id)
         return self
@@ -47,10 +50,11 @@ class Context:
         
     def summary(self, train_loader, test_loader):
         print(f"Device : {self.device}")
-        experiment = mlflow.get_experiment(self.experiment_id)
-        print(f"Name: {experiment.name}")
-        print(f"Experiment_id: {experiment.experiment_id}")
-        print(f"Artifact Location: {experiment.artifact_location}")
+        active_run = mlflow.active_run()
+        if active_run:
+            print(f"Name: {active_run.info.run_name}")
+            print(f"Experiment_id: {active_run.info.experiment_id}")
+            print(f"Artifact Location: {active_run.info.artifact_uri}")
         print(f"Type Network: {self._config.type}")
         X_train, y_train = next(iter(train_loader))
         X_test, y_test = next(iter(test_loader))

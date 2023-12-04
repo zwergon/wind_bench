@@ -146,43 +146,43 @@ class FileWBDataset(WBDataset):
         return X, y
     
 
-from azureml.fsspec import AzureMachineLearningFileSystem
+# from azureml.fsspec import AzureMachineLearningFileSystem
 
 
-class AzureMLDataset(WBDataset):
+# class AzureMLDataset(WBDataset):
    
-    def __init__(self, 
-                 uri, 
-                 train_flag=True, 
-                 train_test_ratio=.8, 
-                normalization="min_max",
-                indices = None):
-        super(AzureMLDataset, self).__init__(
-            train_flag=train_flag, 
-            train_test_ratio=train_test_ratio,
-            normalization=normalization,
-            indices=indices)
+#     def __init__(self, 
+#                  uri, 
+#                  train_flag=True, 
+#                  train_test_ratio=.8, 
+#                 normalization="min_max",
+#                 indices = None):
+#         super(AzureMLDataset, self).__init__(
+#             train_flag=train_flag, 
+#             train_test_ratio=train_test_ratio,
+#             normalization=normalization,
+#             indices=indices)
 
-        self.fs = AzureMachineLearningFileSystem(uri)
+#         self.fs = AzureMachineLearningFileSystem(uri)
      
-        keys = self.fs.glob("**/*.parquet")
+#         keys = self.fs.glob("**/*.parquet")
         
-        self._split_train_test(keys)
+#         self._split_train_test(keys)
 
-    def __getitem__(self, idx):
-        key = self.keys[idx]
+#     def __getitem__(self, idx):
+#         key = self.keys[idx]
 
-        with self.fs.open(key) as f:
-            df = pd.read_parquet(f, 
-                    columns=self.x_columns + self.y_selected
-                    )
+#         with self.fs.open(key) as f:
+#             df = pd.read_parquet(f, 
+#                     columns=self.x_columns + self.y_selected
+#                     )
         
-        X = df.loc[:, self.x_columns].transpose().to_numpy(dtype=np.float32)
-        y = df.loc[:, self.y_selected].transpose().to_numpy(dtype=np.float32)
-        if self.norma is not None:
-            self.norma.norm_x(X)
-            self.norma.norm_y(y)
-        return X, y
+#         X = df.loc[:, self.x_columns].transpose().to_numpy(dtype=np.float32)
+#         y = df.loc[:, self.y_selected].transpose().to_numpy(dtype=np.float32)
+#         if self.norma is not None:
+#             self.norma.norm_x(X)
+#             self.norma.norm_y(y)
+#         return X, y
     
 
 class NumpyWBDataset(Dataset):

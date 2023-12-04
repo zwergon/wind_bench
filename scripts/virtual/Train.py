@@ -1,6 +1,11 @@
 import os
 import torch
 from torch.utils.data import DataLoader
+import sys
+
+print(os.getcwd())
+sys.path.append(os.getcwd())
+
 
 import ray
 from ray import tune
