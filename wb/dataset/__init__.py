@@ -1,5 +1,6 @@
 import os
 
+
 import numpy as np
 import pandas as pd
 
@@ -83,6 +84,9 @@ class WBDataset(Dataset):
     def output_size(self):
         return len(self.y_selected)
     
+    def output_name(self, index):
+        return self.y_selected[index]
+    
     def _split_train_test(self, keys: list):
         for _ in range(int(self.train_test_ratio*len(keys))):
             self.train.append(keys.pop())
@@ -93,17 +97,21 @@ class WBDataset(Dataset):
         else:
             self.keys = self.test
 
+import glob
+
 class FileWBDataset(WBDataset):
 
     @staticmethod
-    def _search_parquets(rootdir):
-        file_list = []
-        for root, directories, file in os.walk(rootdir):
-            for file in file:
-                if(file.endswith(".parquet")):
-                    file_list.append(os.path.join(root, file))
-        return file_list
-
+    def _search_parquets(rootdir, file_list):
+        
+        for f in os.listdir(rootdir):
+            path = os.path.join(rootdir, f)
+            if os.path.isfile(path) and path.endswith(".parquet"):
+                file_list.append(path)
+            else:
+                FileWBDataset._search_parquets(path, file_list)
+        
+        
     def __init__(self, 
                 parquet_file, 
                 train_flag=True, 
@@ -119,8 +127,7 @@ class FileWBDataset(WBDataset):
             )
 
         keys = []
-        for file in self._search_parquets(parquet_file):
-            keys.append(os.path.join(parquet_file, file))
+        self._search_parquets(parquet_file, keys)
 
         self._split_train_test(keys)
 
@@ -183,7 +190,6 @@ class NumpyWBDataset(Dataset):
 
         name = "train" if train_flag else "test"
         
-
         x_name = os.path.join(root_path, f"{name}_data.npy")
         y_name = os.path.join(root_path, f"{name}_labels.npy")
         self.X = np.load(x_name).astype(np.float32)

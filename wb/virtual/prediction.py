@@ -14,6 +14,10 @@ class Prediction:
     def plot(self):
         fig, ax = plt.subplots()
         ax.scatter(self.predicted, self.actual)
+        if self.y_label is not None:
+            ax.set_ylabel(self.y_label)
+        if self.x_label is not None:
+            ax.set_xlabel(self.x_label)
         return fig
         
 
@@ -23,6 +27,6 @@ if __name__ == "__main__":
     X = np.arange(-4., 4., 0.1)
     s_x = np.sin(X)
     c_x = np.cos(X)
-    prediction = Prediction("circle.png", s_x, c_x)
+    prediction = Prediction("circle.png", s_x, c_x, y_label="s_x")
     fig = prediction.plot()
     plt.show()

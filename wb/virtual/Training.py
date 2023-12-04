@@ -3,23 +3,19 @@ import numpy as np
 from torch import nn
 
 import torch.optim as optim
+
+import matplotlib.pyplot as plt
+from torch.optim import lr_scheduler
+
+from ray import tune
+from ray.air import  session
+
+from sklearn.metrics import r2_score
+from wb.dataset import WBDataset
 from wb.virtual.loss_function import get_loss
 from wb.virtual.context import Context
 from wb.utils.config import Config
 from wb.virtual.prediction import Prediction
-import matplotlib.pyplot as plt
-from torch.optim import lr_scheduler
-
-
-
-try:
-    from ray import tune
-    from ray.air import  session
-except ImportError:
-    print("ray is not installed... set tune to False in config.json ")
-
-
-from sklearn.metrics import r2_score
 
 def lr_lambda(epoch):
     # LR to be 0.1 * (1/1+0.01*epoch)
@@ -128,9 +124,17 @@ def train_test(context: Context, model, train_loader, test_loader):
         context.report_loss(epoch, losses)
 
         if epoch % 10 == 0:
-            predictions = [
-                Prediction(f"results_{epoch}.png", labels_list_test[0], outputs_list_test[0])
-            ]
+            dataset : WBDataset = train_loader.dataset
+            predictions = []
+            for i in range(dataset.output_size):
+                predictions.append( Prediction(
+                    f"results_{i}_{epoch}.png", 
+                    labels_list_test[i], 
+                    outputs_list_test[i],
+                    y_label=dataset.output_name(i)
+                    )
+                )
+            
             context.report_prediction(predictions)
 
             context.save_checkpoint(epoch=epoch, 
