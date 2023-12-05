@@ -13,7 +13,8 @@ class Prediction:
 
     def plot(self):
         fig, ax = plt.subplots()
-        ax.scatter(self.predicted, self.actual)
+        ax.plot(self.predicted)
+        ax.plot(self.actual)
         if self.y_label is not None:
             ax.set_ylabel(self.y_label)
         if self.x_label is not None:

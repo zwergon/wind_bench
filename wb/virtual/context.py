@@ -78,16 +78,20 @@ class Context:
             mlflow.log_artifact(local_path=ckp_name, artifact_path="checkpoints")
 
 
-    def report_loss(self, epoch, losses:dict):
+    def report_loss(self, epoch, train_loss, test_loss):
         num_epochs = self.config['epoch']
 
-        for loss in losses.keys():
-            mlflow.log_metrics( {f"train_{loss}": losses[loss][0], f"test_{loss}":losses[loss][1]}, step=epoch)
+        mlflow.log_metrics( {"train_loss": train_loss, "test_loss": test_loss}, step=epoch)
 
         if epoch % 10 == 0:
-            print(f"Epoch {epoch}/{num_epochs}")
-            for loss in losses.keys():
-                print(f"{loss} - train: {losses[loss][0]}, test: {losses[loss][1]}")
+            print(f"Loss - train: {train_loss:.6f}, test: {test_loss:.6f} Epoch {epoch}/{num_epochs}")
+
+    def report_metrics(self, epoch, train_metrics, test_metrics):
+        train_metrics_one = {k:v.detach().cpu().numpy()[0] for k, v in train_metrics.items()}
+        mlflow.log_metrics( train_metrics_one, step=epoch)
+        # mlflow.log_metrics( test_metrics.results, step=epoch)
+
+      
 
     def report_prediction(self, predictions: list):
         for p in predictions:
