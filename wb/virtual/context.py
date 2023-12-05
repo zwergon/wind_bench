@@ -87,7 +87,8 @@ class Context:
             print(f"Loss - train: {train_loss:.6f}, test: {test_loss:.6f} Epoch {epoch}/{num_epochs}")
 
     def report_metrics(self, epoch, train_metrics, test_metrics):
-        train_metrics_one = {k:v.detach().cpu().numpy()[0] for k, v in train_metrics.items()}
+        
+        train_metrics_one = {k:float(v.detach().cpu().numpy()) for k, v in train_metrics.results.items()}
         mlflow.log_metrics( train_metrics_one, step=epoch)
         # mlflow.log_metrics( test_metrics.results, step=epoch)
 

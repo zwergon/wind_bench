@@ -105,18 +105,27 @@ def train_test(context: Context, model, train_loader, test_loader):
         
     
         if epoch % 10 == 0:
-            # dataset : WBDataset = train_loader.dataset
-            # predictions = []
-            # for i in range(dataset.output_size):
-            #     predictions.append( Prediction(
-            #         f"results_{i}_{epoch}.png", 
-            #         labels_list_test[i], 
-            #         outputs_list_test[i],
-            #         y_label=dataset.output_name(i)
-            #         )
-            #     )
+            dataset : WBDataset = train_loader.dataset
+            X_torch, Y_torch = next(iter(train_loader))
+            X_torch = X_torch.to(device)
+            Y_hat_torch = model(X_torch)
             
-            # context.report_prediction(predictions)
+            Y_hat = Y_hat_torch.detach().cpu().numpy()
+            Y = Y_torch.cpu().numpy()
+
+            predictions = []
+            print(Y.shape, Y_hat.shape)
+            for i in range(dataset.output_size):
+                
+                predictions.append( Prediction(
+                    f"results_{i}_{epoch}.png", 
+                    Y_hat[0, i, :],
+                    Y[0, i, :],
+                    y_label=dataset.output_name(i)
+                    )
+                )
+            
+            context.report_prediction(predictions)
 
             context.save_checkpoint(epoch=epoch, 
                                     model=model, 

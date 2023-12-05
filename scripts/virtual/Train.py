@@ -21,12 +21,14 @@ if __name__ == "__main__":
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("dataset", help="path to parquet file", default="D:/lecomtje/Repositories/MPU/wb-virtual/tests/data/100_128\wind_bench.parquet")
+    #parser.add_argument("dataset", help="path to parquet file", default=)
     parser.add_argument("-c", "--config", help="training config file", 
                         type=str, 
                         default= os.path.join(os.path.dirname(__file__), "config.json")
                         )
     args = parser.parse_args()
+
+    args.dataset = "D:/lecomtje/Repositories/MPU/wb-virtual/tests/data/100_128/wind_bench.parquet"
 
     
     #INPUT Parameters
