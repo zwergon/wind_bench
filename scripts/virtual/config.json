@@ -8,8 +8,8 @@
     "ratio_train_test": 0.9,
     "num_workers": 2,
 
-    "type": "LSTM",
-    "indices": [3],
+    "type": "CNN",
+    "indices": [0, 3],
     "hidden_size": 20, 
     "num_layers": 2, 
     "kernel_size": 5,
@@ -22,7 +22,6 @@
     
     "loss":"MSE",
     "alpha":0.3,
-    "gamma":0.005,
-    "tune": false
+    "gamma":0.005
 
 }

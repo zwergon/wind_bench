@@ -13,7 +13,7 @@ from wb.dataset import WBDataset
 from wb.virtual.loss_function import get_loss
 from wb.virtual.context import Context
 from wb.utils.config import Config
-from wb.virtual.prediction import Prediction
+from wb.virtual.predictions import Predictions
 from wb.virtual.metrics_collection import MetricsCollection
 
 def lr_lambda(epoch):
@@ -44,7 +44,7 @@ def train_test(context: Context, model, train_loader, test_loader):
 
     scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
-    
+    predictions = Predictions(train_loader, device )
 
     for epoch in range(num_epochs):
 
@@ -93,37 +93,17 @@ def train_test(context: Context, model, train_loader, test_loader):
         test_loss /= len(test_loader)
         test_metrics.compute()
         
-        print(train_metrics.results['r2'])
-        print(test_metrics.results['r2'])
-
-
         # Reporting
         context.report_loss(epoch, train_loss, test_loss)
 
 
-        context.report_metrics(epoch, train_metrics, test_metrics)
+        context.report_metrics(epoch, train_metrics)
+        context.report_metrics(epoch, test_metrics)
         
     
         if epoch % 10 == 0:
-            dataset : WBDataset = train_loader.dataset
-            X_torch, Y_torch = next(iter(train_loader))
-            X_torch = X_torch.to(device)
-            Y_hat_torch = model(X_torch)
             
-            Y_hat = Y_hat_torch.detach().cpu().numpy()
-            Y = Y_torch.cpu().numpy()
-
-            predictions = []
-            print(Y.shape, Y_hat.shape)
-            for i in range(dataset.output_size):
-                
-                predictions.append( Prediction(
-                    f"results_{i}_{epoch}.png", 
-                    Y_hat[0, i, :],
-                    Y[0, i, :],
-                    y_label=dataset.output_name(i)
-                    )
-                )
+            predictions.compute(epoch, model)
             
             context.report_prediction(predictions)
 

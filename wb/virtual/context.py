@@ -12,7 +12,7 @@ import numpy as np
 
 from wb.utils.config import Config
 from wb.virtual.checkpoint import CheckPoint
-
+from wb.virtual.predictions import Predictions
 
 
 class Context:
@@ -84,142 +84,27 @@ class Context:
         mlflow.log_metrics( {"train_loss": train_loss, "test_loss": test_loss}, step=epoch)
 
         if epoch % 10 == 0:
-            print(f"Loss - train: {train_loss:.6f}, test: {test_loss:.6f} Epoch {epoch}/{num_epochs}")
+            print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f} ")
 
-    def report_metrics(self, epoch, train_metrics, test_metrics):
-        
-        train_metrics_one = {k:float(v.detach().cpu().numpy()) for k, v in train_metrics.results.items()}
-        mlflow.log_metrics( train_metrics_one, step=epoch)
+    def report_metrics(self, epoch, metrics):
+        values = {}
+        for k, v in metrics.results.items():
+            for c in range(v.shape[0]):
+                values[f"{k}_{c}"] = v[c].item()
+        mlflow.log_metrics( values, step=epoch)
+
+
         # mlflow.log_metrics( test_metrics.results, step=epoch)
 
       
 
-    def report_prediction(self, predictions: list):
-        for p in predictions:
-            fig = p.plot()
-            mlflow.log_figure(fig, p.file)
+    def report_prediction(self, predictions: Predictions):
+        for data in predictions.predictions:
+            fig, ax = plt.subplots()
+            ax.plot(data['predicted'])
+            ax.plot(data['actual'])
+            ax.set_ylabel(data['y_label'])
+            mlflow.log_figure(fig, data['file'])
             plt.close(fig)
-        
-    # def report_predict(self, epoch, mud_x, pred_mud_x, mud_y, pred_mud_y, mud_z, pred_mud_z, 
-    #                    wat_x, pred_wat_x, wat_y, pred_wat_y, wat_z, pred_wat_z, offset=0):
-
-    #     if self.logger is not None:
-    #         scatter2d = [(i, mud_x[i]) for i in range(offset, len(mud_x))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Mudline moment_Mx {epoch}',
-    #             "Actual",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Mudline Moment Mx"
-    #         )
-
-    #         scatter2d = [(i, pred_mud_x[i]) for i in range(offset, len(mud_x))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Mudline moment_Mx {epoch}',
-    #             "Predicted",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Mudline Moment Mx"
-    #         )
-
-    #         scatter2d = [(i, mud_y[i]) for i in range(offset, len(mud_y))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Mudline moment_My {epoch}',
-    #             "Actual",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="mudline Moment My"
-    #         )
-
-    #         scatter2d = [(i, pred_mud_y[i]) for i in range(offset, len(mud_y))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Mudline moment_My {epoch}',
-    #             "Predicted",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="mudline Moment My"
-    #         )
-
-    #         scatter2d = [(i, mud_z[i]) for i in range(offset, len(mud_z))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Mudline moment Mz {epoch}',
-    #             "Actual",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="mudline Moment Mz"
-    #         )
-
-    #         scatter2d = [(i, pred_mud_z[i]) for i in range(offset, len(mud_z))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Mudline moment Mz {epoch}',
-    #             "Predicted",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="mudline Moment Mz"
-    #         )
-
-    #         scatter2d = [(i, wat_x[i]) for i in range(offset, len(wat_x))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Waterline Moment Mx {epoch}',
-    #             "Actual",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Waterline moment Mx"
-    #         )
-
-    #         scatter2d = [(i, pred_wat_x[i]) for i in range(offset, len(wat_x))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Waterline Moment Mx {epoch}',
-    #             "Predicted",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Waterline moment Mx"
-    #         )
-
-    #         scatter2d = [(i, wat_y[i]) for i in range(offset, len(wat_y))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Waterline Moment My {epoch}',
-    #             "Actual",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Waterline moment My"
-    #         )
-
-    #         scatter2d = [(i, pred_wat_y[i]) for i in range(offset, len(wat_y))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Waterline Moment My {epoch}',
-    #             "Predicted",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Waterline moment My"
-    #         )
-
-    #         scatter2d = [(i, wat_z[i]) for i in range(offset, len(wat_z))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Waterline moment Mz {epoch}',
-    #             "Actual",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Waterline moment Mz"
-    #         )
-
-    #         scatter2d = [(i, pred_wat_z[i]) for i in range(offset, len(wat_z))]
-    #         self.logger.report_scatter2d(
-    #             f'Actual vs. Predicted Waterline moment Mz {epoch}',
-    #             "Predicted",
-    #             iteration=epoch,
-    #             scatter=scatter2d,
-    #             xaxis="Time",
-    #             yaxis="Waterline moment Mz"
-    #         )
+            
+  
