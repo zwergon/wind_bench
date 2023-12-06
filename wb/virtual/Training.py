@@ -19,7 +19,7 @@ from wb.virtual.metrics_collection import MetricsCollection
 
 
 def optimizer_function(config, model):
-     return optim.Adam(
+     return optim.SGD(
             model.parameters(),
             lr=config["learning_rate"],
             weight_decay=config['weight_decay']
@@ -37,7 +37,53 @@ def scheduler_function(optimizer):
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group['lr']
+    
 
+def find_lr(context: Context, model, train_loader):
+    device = context.device
+    config : Config = context.config
+    
+    num_epochs = config["epochs"]
+
+    num_batch = len(train_loader)
+
+    optimizer = optimizer_function(config, model)
+    
+    loss_fct = loss_function(config, device)
+
+    lr = config['learning_rate']                                 
+    mult = (lr / 1e-8) ** (1/((num_batch*num_epochs)-1))   
+    optimizer_arg = optimizer
+    optimizer_arg.param_groups[0]['lr'] = 1e-8                 
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer_arg, step_size=1, gamma=mult) 
+    
+    lrs, losses=[],[]    
+    for epoch in range(num_epochs):
+
+        #Train
+        model.train()
+        for X, Y in train_loader:
+
+            X = X.to(device)
+            Y = Y.to(device)
+            optimizer.zero_grad()
+            Y_hat = model(X)
+            
+            loss = loss_fct(Y_hat, Y)
+            loss.backward()
+            optimizer.step()
+
+            lr = scheduler.get_last_lr()[0]
+            
+            lrs.append(lr)           
+            losses.append(loss.item()) 
+
+              # scheduler update
+            scheduler.step()
+            
+        context.report_loss(epoch, train_loss=loss.item(), lr=lr, step=1)
+             
+    context.report_lr_find(lrs, losses)
 
 
 def train_test(context: Context, model, train_loader, test_loader):
@@ -107,7 +153,6 @@ def train_test(context: Context, model, train_loader, test_loader):
        
         # Reporting
         context.report_loss(epoch, train_loss, test_loss, get_lr(optimizer))
-
 
         context.report_metrics(epoch, train_metrics)
         context.report_metrics(epoch, test_metrics)

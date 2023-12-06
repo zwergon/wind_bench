@@ -80,21 +80,20 @@ class Context:
             mlflow.log_artifact(local_path=ckp_name, artifact_path="checkpoints")
 
 
-    def report_loss(self, epoch, train_loss, test_loss, lr):
+    def report_loss(self, epoch, train_loss, lr, test_loss=None, step=10):
         num_epochs = self.config['epochs']
 
-        mlflow.log_metrics( 
-                    {
-                        "train_loss": train_loss, 
-                        "test_loss": test_loss,
-                        "lr": lr
-                    }, 
-                    step=epoch
-                )
+        losses = { "train_loss": train_loss, "lr": lr }
+        if test_loss is not None:
+            losses['test_loss'] = test_loss
+        mlflow.log_metrics( losses, step=epoch )
 
-        if epoch % 10 == 0:
-            print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f}, lr {lr:.6f}")
-
+        if epoch % step == 0:
+            if test_loss is None:
+                print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, lr {lr:.2e}")
+            else:
+                print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f}, lr {lr:.2e}")
+ 
     def report_metrics(self, epoch, metrics):
         values = {}
         for k, v in metrics.results.items():
@@ -114,5 +113,13 @@ class Context:
             ax.set_ylabel(data['y_label'])
             mlflow.log_figure(fig, data['file'])
             plt.close(fig)
+
+
+    def report_lr_find(self, lr, losses):
+        from wb.utils.display import lrfind_plot
+
+        fig = lrfind_plot(lr, losses)
+        mlflow.log_figure(fig, f"lr_find.png")
+        plt.close(fig)
             
   
