@@ -55,7 +55,6 @@ if __name__ == "__main__":
 
         config = Config(jsonname = os.path.join(os.path.dirname(__file__), "config.json"))
 
-
         _, test_dataset = dataset(config)
         test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
         

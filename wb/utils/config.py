@@ -16,13 +16,13 @@ class FileType(IntEnum):
 
 class Config:
 
-    def __init__(self, jsonname) -> None:
-        with open(jsonname, 'r') as file:
+    def __init__(self, args) -> None:
+        with open(args.config, 'r') as file:
             self.__dict__ = json.load(file)
-        self.dirname = os.path.dirname(jsonname)
+        self.dirname = os.path.dirname(args.config)
 
-   
-
+        self.__dict__.update(args.__dict__)
+        
     def _fstype(self):
         print(self.root_path)
         idx = self.root_path.find("file://")

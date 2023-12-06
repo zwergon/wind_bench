@@ -9,15 +9,9 @@
     "num_workers": 2,
 
     "type": "CNN",
-    "indices": [0, 3],
     "hidden_size": 20, 
     "num_layers": 2, 
     "kernel_size": 5,
-    
-    "learning_rate":0.0009888,      
-    "weight_decay": 1e-5, 
-    "epoch": 101,
-    "batch_size":8,
     "dropout": 0,
     
     "loss":"MSE",

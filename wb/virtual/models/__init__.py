@@ -1,13 +1,17 @@
 
 
+
+from wb.virtual.context import Context
 from wb.virtual.models.LSTM_CNN import LSTMCNNModel
 from wb.virtual.models.LSTM import LSTMModel
 from wb.virtual.models.CNN import CNNModel
 from wb.virtual.models.MLP import MLPModel
 from wb.virtual.models.RNN  import RNNVanilla
 
-def get_model(input_size, output_size, config: dict):
+def get_model(context: Context, input_size, output_size):
      
+    config = context.config
+
     kind = config['type']
    
     if kind == "LSTM":
@@ -47,5 +51,6 @@ def get_model(input_size, output_size, config: dict):
     else:
         raise Exception(f"model of type {kind} is not handled")
 
+    model = model.to(device=context.device)
     return model
 

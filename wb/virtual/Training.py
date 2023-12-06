@@ -29,7 +29,7 @@ def train_test(context: Context, model, train_loader, test_loader):
     config : Config = context.config
     train_dataset : WBDataset = train_loader.dataset
 
-    num_epochs = config["epoch"]
+    num_epochs = config["epochs"]
 
     context.summary(train_loader, test_loader)
 

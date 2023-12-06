@@ -4,6 +4,7 @@ import os
 import torch
 import uuid
 import mlflow
+from mlflow.models import infer_signature
 import tempfile
 
 
@@ -36,6 +37,7 @@ class Context:
 
     def __enter__(self):
         mlflow.start_run(experiment_id=self.experiment_id)
+        mlflow.log_params(self.config)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -78,8 +80,9 @@ class Context:
             mlflow.log_artifact(local_path=ckp_name, artifact_path="checkpoints")
 
 
+
     def report_loss(self, epoch, train_loss, test_loss):
-        num_epochs = self.config['epoch']
+        num_epochs = self.config['epochs']
 
         mlflow.log_metrics( {"train_loss": train_loss, "test_loss": test_loss}, step=epoch)
 
@@ -89,13 +92,12 @@ class Context:
     def report_metrics(self, epoch, metrics):
         values = {}
         for k, v in metrics.results.items():
-            for c in range(v.shape[0]):
-                values[f"{k}_{c}"] = v[c].item()
+            if len(v.shape) == 0:
+                values[k] = v.item()
+            else:
+                for c in range(v.shape[0]):
+                    values[f"{k}_{c}"] = v[c].item()
         mlflow.log_metrics( values, step=epoch)
-
-
-        # mlflow.log_metrics( test_metrics.results, step=epoch)
-
       
 
     def report_prediction(self, predictions: Predictions):

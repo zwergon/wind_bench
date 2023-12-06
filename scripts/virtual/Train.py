@@ -21,18 +21,24 @@ if __name__ == "__main__":
 
     import argparse
     parser = argparse.ArgumentParser()
-    #parser.add_argument("dataset", help="path to parquet file", default=)
+    parser.add_argument("dataset", help="path to parquet file")
+    parser.add_argument("-e", "--epochs", help="number of epochs in learning process", type=int, default=101 )
+    parser.add_argument("-b", "--batch_size", help="batch size in learning process", type=int, default=8 )
+    
+    parser.add_argument("-lr", "--learning_rate", help="learning rate for optimizer", type=float, default=1e-4)
+    parser.add_argument("-wd", "--weight_decay", help="regularization", type=float, default=1e-5)
+
+    parser.add_argument("-i", "--indices", help="output indices [0..6] (Default:0)", nargs='+', type=int, default=[0])
     parser.add_argument("-c", "--config", help="training config file", 
                         type=str, 
                         default= os.path.join(os.path.dirname(__file__), "config.json")
                         )
     args = parser.parse_args()
 
-    args.dataset = "/home/jef/Documents/Projects/repositories/wind_bench/tests/data/100_128/wind_bench.parquet"
-
     
     #INPUT Parameters
-    config = Config(jsonname = args.config)
+    config = Config(args)
+
 
     with Context(config) as ctx:
      
@@ -40,7 +46,7 @@ if __name__ == "__main__":
             args.dataset, 
             train_flag=True, 
             train_test_ratio=config.ratio_train_test,
-            indices=config.indices
+            indices=args.indices
             )
         train_loader = DataLoader(
             train_dataset, 
@@ -53,7 +59,7 @@ if __name__ == "__main__":
             args.dataset, 
             train_flag=False, 
             train_test_ratio=config.ratio_train_test,
-            indices=config.indices
+            indices=args.indices
             )
         test_loader = DataLoader(
             test_dataset, 
@@ -63,10 +69,10 @@ if __name__ == "__main__":
             )
 
         model = get_model(
+            ctx,
             train_dataset.input_size,  
-            train_dataset.output_size,
-            config.__dict__)
-        model = model.to(ctx.device)
-
+            train_dataset.output_size
+            )
+        
 
         train_test(ctx, model, train_loader, test_loader)
