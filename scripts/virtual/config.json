@@ -2,8 +2,6 @@
     "project": "wb_virtual",
     "tracking_uri": null,
     
-    "n_samples": 100,
-    "sequence_length":128,
     "normalization": true,
     "ratio_train_test": 0.9,
     "num_workers": 2,
