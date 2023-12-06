@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.optim as optim
 
 class CNNModel(nn.Module):
-    def __init__(self, input_size, output_size, kernel_size):
+    def __init__(self, input_size, output_size, kernel_size, dropout):
         super(CNNModel, self).__init__()
         
         self.encodeur=nn.Sequential(
                       nn.Conv1d(input_size, 7, kernel_size=kernel_size, padding="same"),
                       nn.BatchNorm1d(7),
-                      #nn.Dropout(0.1),
+                      nn.Dropout(dropout),
                       nn.ReLU(),
                       nn.Conv1d(7, 5, kernel_size=kernel_size, padding="same"),
                       nn.ReLU()

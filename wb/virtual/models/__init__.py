@@ -30,7 +30,8 @@ def get_model(context: Context, input_size, output_size):
         model = CNNModel(
             input_size, 
             output_size,
-            kernel_size=config['kernel_size']
+            kernel_size=config['kernel_size'],
+            dropout=config['dropout']
             ) 
     elif kind == "RNN":
         model = RNNVanilla(

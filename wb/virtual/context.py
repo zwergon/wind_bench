@@ -80,14 +80,20 @@ class Context:
             mlflow.log_artifact(local_path=ckp_name, artifact_path="checkpoints")
 
 
-
-    def report_loss(self, epoch, train_loss, test_loss):
+    def report_loss(self, epoch, train_loss, test_loss, lr):
         num_epochs = self.config['epochs']
 
-        mlflow.log_metrics( {"train_loss": train_loss, "test_loss": test_loss}, step=epoch)
+        mlflow.log_metrics( 
+                    {
+                        "train_loss": train_loss, 
+                        "test_loss": test_loss,
+                        "lr": lr
+                    }, 
+                    step=epoch
+                )
 
         if epoch % 10 == 0:
-            print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f} ")
+            print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f}, lr {lr:.6f}")
 
     def report_metrics(self, epoch, metrics):
         values = {}

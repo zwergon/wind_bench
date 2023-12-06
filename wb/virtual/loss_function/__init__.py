@@ -3,7 +3,7 @@ from torch import nn
 from wb.virtual.loss_function.dilate import Dilate
 from wb.virtual.loss_function.rmse import RMSELoss
 
-def get_loss(device, config: dict):
+def loss_function(config: dict, device):
      
     k = config['loss']
     if k == "MSE":

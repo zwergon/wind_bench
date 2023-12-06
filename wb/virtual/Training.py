@@ -10,17 +10,34 @@ from torch.optim import lr_scheduler
 from torchmetrics import R2Score
 
 from wb.dataset import WBDataset
-from wb.virtual.loss_function import get_loss
+from wb.virtual.loss_function import loss_function
 from wb.virtual.context import Context
 from wb.utils.config import Config
 from wb.virtual.predictions import Predictions
 from wb.virtual.metrics_collection import MetricsCollection
 
-def lr_lambda(epoch):
-    # LR to be 0.1 * (1/1+0.01*epoch)
-    base_lr = 0.1
-    factor = 0.5
-    return 0.995 ** epoch
+
+
+def optimizer_function(config, model):
+     return optim.Adam(
+            model.parameters(),
+            lr=config["learning_rate"],
+            weight_decay=config['weight_decay']
+            )
+
+def scheduler_function(optimizer):
+    def lr_lambda(epoch):
+        # LR to be 0.1 * (1/1+0.01*epoch)
+        base_lr = 0.1
+        factor = 0.5
+        return 0.995 ** epoch
+    
+    return lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
+
+def get_lr(optimizer):
+    for param_group in optimizer.param_groups:
+        return param_group['lr']
+
 
 
 def train_test(context: Context, model, train_loader, test_loader):
@@ -33,21 +50,15 @@ def train_test(context: Context, model, train_loader, test_loader):
 
     context.summary(train_loader, test_loader)
 
-    criterion = get_loss(device, config)
+    criterion = loss_function(config, device)
 
-    optimizer = optim.Adam(
-            model.parameters(),
-            lr=config["learning_rate"],
-            weight_decay=config['weight_decay']
-            )
+    optimizer = optimizer_function(config, model)
 
+    scheduler = scheduler_function(optimizer)
 
-    scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
-
-    predictions = Predictions(train_loader, device )
+    predictions = Predictions(train_loader, device)
 
     for epoch in range(num_epochs):
-
 
         #Train
         train_loss = 0.0
@@ -93,8 +104,9 @@ def train_test(context: Context, model, train_loader, test_loader):
         test_loss /= len(test_loader)
         test_metrics.compute()
         
+       
         # Reporting
-        context.report_loss(epoch, train_loss, test_loss)
+        context.report_loss(epoch, train_loss, test_loss, get_lr(optimizer))
 
 
         context.report_metrics(epoch, train_metrics)
