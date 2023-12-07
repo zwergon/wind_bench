@@ -13,7 +13,9 @@
     "dropout": 0,
     
     "loss":"MSE",
+    "optimizer": "Adam",
     "alpha":0.3,
-    "gamma":0.005
+    "gamma":0.005,
+    "cuda": true
 
 }

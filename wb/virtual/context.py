@@ -22,22 +22,22 @@ class Context:
     def _experiment_name(root_name):
         return f"{root_name}_{str(uuid.uuid1())[:8]}"
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, checkpoint=CheckPoint()) -> None:
         self._config = config
+        self.experiment_id = None
+        self.checkpoint = checkpoint
 
-        self.checkpoint = CheckPoint()
-
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-        if config.tracking_uri:
-            mlflow.set_tracking_uri(config.tracking_uri)
-            self.experiment_id = mlflow.create_experiment(self._experiment_name(config.project))
-        else:
-            self.experiment_id = None
+        self.device = torch.device("cuda" if config.cuda and torch.cuda.is_available() else "cpu")
 
     def __enter__(self):
+
+        if self.config['tracking_uri']:
+            mlflow.set_tracking_uri(self.config['tracking_uri'])
+            self.experiment_id = mlflow.create_experiment(self._experiment_name(self.config['project']))
+     
         mlflow.start_run(experiment_id=self.experiment_id)
         mlflow.log_params(self.config)
+        
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):

@@ -3,8 +3,9 @@ import torch
 
 class CheckPoint:
 
-    def __init__(self) -> None:
+    def __init__(self, path=None) -> None:
         self.params = {}
+        self.path = path
 
     @property
     def state_dict(self):

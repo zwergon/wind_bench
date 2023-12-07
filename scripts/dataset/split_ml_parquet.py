@@ -1,18 +1,7 @@
 import os
 import pyarrow.parquet as pq
 
-from azure.ai.ml import MLClient
-from azure.identity import DefaultAzureCredential
-from tqdm import tqdm
-
-
-def _search_parquets(rootdir):
-    file_list = []
-    for root, directories, file in os.walk(rootdir):
-        for file in file:
-            if(file.endswith(".parquet")):
-                file_list.append(os.path.join(root, file))
-    return file_list
+from wb.dataset import FileWBDataset
 
 
 
@@ -22,8 +11,10 @@ def download_split(in_parquet_file, out_parquet_file, n_items, split):
 
     count = 0
 
-    
-    for file in _search_parquets(in_parquet_file):
+    files = []
+    FileWBDataset._search_parquets(in_parquet_file, files)
+
+    for file in files:
         
             table = pq.read_table(file) 
         

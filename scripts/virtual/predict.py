@@ -8,7 +8,9 @@ from wb.virtual.models import get_model
 from wb.dataset import dataset
 
 from wb.utils.config import Config
+from wb.virtual.context import Context
 from wb.virtual.checkpoint import CheckPoint
+from wb.dataset import FileWBDataset
 
 def get_all_predicted(model, test_loader, y_test):
         all_outputs = []
@@ -51,12 +53,36 @@ def get_state_dict(args):
 if __name__ == "__main__":
 
         offset = 10
-        index = 0
+      
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument("dataset", help="path to parquet file")
+        parser.add_argument("checkpoint", help="path to checkpoint")
+        parser.add_argument("index", help="which element in the dataset", type=int)
+        parser.add_argument("-s", "--span", help="range in dataset to keep [1000:1500]", type=int, nargs='+', default=[1000, 1500])
+        parser.add_argument("-i", "--indices", help="output indices [0..6] (Default:0)", nargs='+', type=int, default=[0])
+        parser.add_argument("-c", "--config", help="training config file", 
+                                type=str, 
+                                default= os.path.join(os.path.dirname(__file__), "config.json")
+                                )
+        args = parser.parse_args()
 
-        config = Config(jsonname = os.path.join(os.path.dirname(__file__), "config.json"))
+        
+        #INPUT Parameters
+        config = Config(args)
+        config.cuda = False
 
-        _, test_dataset = dataset(config)
-        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+        checkpoint = CheckPoint.load(args.checkpoint)
+        ctx = Context(config, checkpoint=checkpoint)
+
+
+        dataset = FileWBDataset(
+            args.dataset, 
+            train_flag=False, 
+            train_test_ratio=config.ratio_train_test,
+            indices=args.indices
+            )
+        test_loader = DataLoader(dataset, batch_size=1, shuffle=True)
         
         X_test, y_test = next(iter(test_loader))
         print(f"X_test : {X_test.shape}")
@@ -64,21 +90,18 @@ if __name__ == "__main__":
     
 
         print(f"Type Network: {config.type}")
-        model = get_model(test_dataset.input_size, test_dataset.output_size, config.__dict__)
-        model.load_state_dict(get_state_dict(config))
+        model = get_model(ctx, dataset.input_size, dataset.output_size)
+        
+        model.load_state_dict(checkpoint.state_dict)
 
-        #real_outputs, predicted_outputs = get_all_predicted(model, test_loader, y_test)
-        real_outputs, predicted_outputs = get_one_output(model, test_loader, index)
-
-        # real_outputs = real_outputs - np.mean(real_outputs)
-        # predicted_outputs = predicted_outputs - np.mean(predicted_outputs)
+        real_outputs, predicted_outputs = get_one_output(model, test_loader, args.index)
 
         # Plot actual vs. predicted values
         plt.figure(figsize=(9, 6))
-        plt.plot(real_outputs[offset:], label='Actual')
-        plt.plot(predicted_outputs[offset:], label='Predicted')
+        plt.plot(real_outputs[args.span[0]:args.span[1]], label='Actual')
+        plt.plot(predicted_outputs[args.span[0]:args.span[1]], label='Predicted')
         plt.xlabel('Time')
-        plt.ylabel('Mudline Moment')
+        plt.ylabel(dataset.output_name(args.index))
         plt.title('Actual vs. Predicted')
         plt.legend()
         plt.show()

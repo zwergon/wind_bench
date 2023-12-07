@@ -19,11 +19,21 @@ from wb.virtual.metrics_collection import MetricsCollection
 
 
 def optimizer_function(config, model):
-     return optim.Adam(
-            model.parameters(),
-            lr=config["learning_rate"],
-            weight_decay=config['weight_decay']
-            )
+
+    if config['optimizer'] == "Adam":
+        return optim.Adam(
+                model.parameters(),
+                lr=config["learning_rate"],
+                weight_decay=config['weight_decay']
+                )
+    elif config['optimizer'] == "SGD":
+        return optim.SGD(
+                model.parameters(),
+                lr=config["learning_rate"],
+                weight_decay=config['weight_decay']
+                )
+    else:
+        raise Exception("Unknown optimizer")
 
 def scheduler_function(optimizer):
     def lr_lambda(epoch):
