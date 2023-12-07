@@ -7,12 +7,12 @@
     "num_workers": 2,
 
     "type": "LSTM",
-    "hidden_size": 20, 
-    "num_layers": 2, 
+    "hidden_size": 80, 
+    "num_layers": 3, 
     "kernel_size": 5,
     "dropout": 0,
     
-    "loss":"MSE",
+    "loss":"MAE",
     "optimizer": "Adam",
     "alpha":0.3,
     "gamma":0.005,

@@ -3,6 +3,7 @@ from torch import nn
 from wb.virtual.loss_function.dilate import Dilate
 from wb.virtual.loss_function.rmse import RMSELoss
 
+
 def loss_function(config: dict, device):
      
     k = config['loss']
@@ -11,7 +12,8 @@ def loss_function(config: dict, device):
 
     elif k == "dilate":
         criterion = Dilate(device, config).forward
-    
     elif k == "RMSE":
         criterion = RMSELoss()
+    elif k == "MAE":
+        criterion = nn.SmoothL1Loss()
     return criterion

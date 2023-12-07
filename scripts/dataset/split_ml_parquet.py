@@ -40,8 +40,8 @@ if __name__ == "__main__":
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", help="input parquet file")
-    parser.add_argument("-o", "--output", help="output_parquet_file")
+    parser.add_argument("input", help="input parquet file")
+    parser.add_argument("output", help="output_parquet_file")
     parser.add_argument("-n", "--nitems", help='n samples in dataset', type=int, default=1000)
     parser.add_argument("-s", "--size", type=int, help="size of one sample in the dataset", default=1028)
     args = parser.parse_args()
