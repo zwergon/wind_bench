@@ -14,7 +14,7 @@ from wb.virtual.training import train_test
 from wb.virtual.context import Context
 
 from wb.utils.config import Config
-from wb.utils.arguments import parse_args
+from arguments import parse_args
 
 
 if __name__ == "__main__":

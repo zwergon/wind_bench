@@ -88,7 +88,7 @@ class Context:
             losses['test_loss'] = test_loss
         mlflow.log_metrics( losses, step=epoch )
 
-        if epoch % step == 0:
+        if step is None or epoch % step == 0:
             if test_loss is None:
                 print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, lr {lr:.2e}")
             else:

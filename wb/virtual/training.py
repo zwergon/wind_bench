@@ -19,7 +19,7 @@ from wb.virtual.metrics_collection import MetricsCollection
 
 
 def optimizer_function(config, model):
-     return optim.SGD(
+     return optim.Adam(
             model.parameters(),
             lr=config["learning_rate"],
             weight_decay=config['weight_decay']
@@ -33,7 +33,7 @@ def scheduler_function(optimizer):
         return 0.995 ** epoch
     
     return lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
-
+    
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group['lr']
@@ -81,7 +81,7 @@ def find_lr(context: Context, model, train_loader):
               # scheduler update
             scheduler.step()
             
-        context.report_loss(epoch, train_loss=loss.item(), lr=lr, step=1)
+            context.report_loss(epoch, train_loss=loss.item(), lr=lr, step=None)
              
     context.report_lr_find(lrs, losses)
 
@@ -126,8 +126,9 @@ def train_test(context: Context, model, train_loader, test_loader):
             train_metrics.update_from_batch(Y_hat, Y)
 
             train_loss += loss.item()
-        
-        scheduler.step()
+
+        if scheduler:
+            scheduler.step()
         
         train_loss /= len(train_loader)
         train_metrics.compute()
@@ -152,7 +153,7 @@ def train_test(context: Context, model, train_loader, test_loader):
         
        
         # Reporting
-        context.report_loss(epoch, train_loss, test_loss, get_lr(optimizer))
+        context.report_loss(epoch, train_loss, test_loss=test_loss, lr=get_lr(optimizer))
 
         context.report_metrics(epoch, train_metrics)
         context.report_metrics(epoch, test_metrics)

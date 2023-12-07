@@ -1,6 +1,9 @@
 
 import os
 import torch
+import sys
+
+sys.path.append(os.getcwd())
 
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
@@ -10,7 +13,7 @@ from wb.utils.config import Config
 from wb.virtual.context import Context
 from wb.virtual.training import find_lr
 from wb.virtual.models import get_model
-from wb.utils.arguments import parse_args
+from arguments import parse_args
  
 
 
