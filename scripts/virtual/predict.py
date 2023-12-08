@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
         
         #INPUT Parameters
-        config = Config(args)
+        config = Config.create_from_args(args)
         config.cuda = False
 
         checkpoint = CheckPoint.load(args.checkpoint)

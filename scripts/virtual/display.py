@@ -24,7 +24,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     #INPUT Parameters
-    config = Config(args)
+    config = Config.create_from_args(args)
 
     with Context(config) as ctx:
      

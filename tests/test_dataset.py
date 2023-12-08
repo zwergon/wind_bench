@@ -3,7 +3,7 @@ import os
 
 from wb.dataset.dataloader import NaiveDataLoader
 from wb.utils.time_utils import Timer
-from wb.dataset import FileWBDataset, NumpyWBDataset, AzureMLDataset
+from wb.dataset import FileWBDataset, NumpyWBDataset
 
 
 class TestDataset(unittest.TestCase):
@@ -21,6 +21,7 @@ class TestDataset(unittest.TestCase):
         dataset = FileWBDataset(filename)
 
         print(f"train dataset (size) {len(dataset)}")
+        print(dataset.partition_keys)
         
         dataloader = NaiveDataLoader(dataset, batch_size=self.batch_size)
         with Timer() as timer:
@@ -31,20 +32,20 @@ class TestDataset(unittest.TestCase):
 
         print(f"load batch size {self.batch_size} in {float(timer):.2f}s ({self.batch_size/float(timer):.2f} i/s)")
         
-    def test_az_ml_dataset(self):
-        print("AzureMLDataset")
-        dataset = AzureMLDataset("azureml://subscriptions/8a889cf2-7b3d-4003-824e-b503f56604b0/resourcegroups/rg-jef-ml/workspaces/ml-gpu/datastores/workspaceblobstore/paths/UI/2023-11-29_114659_UTC/wind_bench_1000_1028.parquet", indices=[0, 3])
+    # def test_az_ml_dataset(self):
+    #     print("AzureMLDataset")
+    #     dataset = AzureMLDataset("azureml://subscriptions/8a889cf2-7b3d-4003-824e-b503f56604b0/resourcegroups/rg-jef-ml/workspaces/ml-gpu/datastores/workspaceblobstore/paths/UI/2023-11-29_114659_UTC/wind_bench_1000_1028.parquet", indices=[0, 3])
         
-        print(f"train dataset (size) {len(dataset)}")
+    #     print(f"train dataset (size) {len(dataset)}")
 
-        dataloader = NaiveDataLoader(dataset, batch_size=self.batch_size)
-        with Timer() as timer:
-            for batch in dataloader:
-                X, y = batch
-                print(X.shape, y.shape)
-                break
+    #     dataloader = NaiveDataLoader(dataset, batch_size=self.batch_size)
+    #     with Timer() as timer:
+    #         for batch in dataloader:
+    #             X, y = batch
+    #             print(X.shape, y.shape)
+    #             break
 
-        print(f"load batch size {self.batch_size} in {float(timer):.2f}s ({self.batch_size/float(timer):.2f} i/s)")
+    #     print(f"load batch size {self.batch_size} in {float(timer):.2f}s ({self.batch_size/float(timer):.2f} i/s)")
 
     def test_numpy_dataset(self):
         print("NumpyWBDataset")

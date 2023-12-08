@@ -1,6 +1,6 @@
 import os
-
-
+import re
+import random
 import numpy as np
 import pandas as pd
 
@@ -11,6 +11,8 @@ from wb.dataset.normalize import Scaling
 
 
 class WBDataset(Dataset):
+
+    _pattern = re.compile(r"\/\w+=([\w|\.]+)\/") 
 
     stats = {"Tower top fore-aft acceleration ay [m/s2]": { "mean": -3.732385818133257e-07, "std": 0.1175451058459768, "min": -0.8967088086, "25%": -0.07215977105999999, "50%": 7.251252000000028e-05, "75%": 0.07217759763, "max": 0.8616838365799999}, 
              "Tower top side-side acceleration ax [m/s2]": { "mean": -4.3043763994239984e-05, "std": 0.17042526932798652, "min": -1.7410713982200001, "25%": -0.08029902833, "50%": -5.848058999999989e-05, "75%": 0.08026554234000001, "max": 1.6791001381199997}, 
@@ -51,7 +53,8 @@ class WBDataset(Dataset):
                  train_flag, 
                  train_test_ratio, 
                  normalization,
-                 indices
+                 indices,
+                 seed
                  ):
        
         self.train_flag = train_flag
@@ -59,6 +62,8 @@ class WBDataset(Dataset):
         self.train = []
         self.test = []
         self.keys = []
+        random.seed(seed)
+        
 
         if indices is None:
             self.y_selected = self.y_columns
@@ -79,6 +84,15 @@ class WBDataset(Dataset):
     @property
     def input_size(self):
         return len(self.x_columns)
+    
+    @property
+    def partition_keys(self):
+        keys = []
+        for k in self.keys:
+            m = re.search(self._pattern, k)
+            if m:
+                keys.append(m.group(1))
+        return keys
 
     @property
     def output_size(self):
@@ -88,7 +102,10 @@ class WBDataset(Dataset):
         return self.y_selected[index]
     
     def _split_train_test(self, keys: list):
-        for _ in range(int(self.train_test_ratio*len(keys))):
+
+        indices = list(range(int(self.train_test_ratio*len(keys))))
+        random.shuffle(indices)
+        for _ in indices:
             self.train.append(keys.pop())
         self.test = keys
 
@@ -117,13 +134,15 @@ class FileWBDataset(WBDataset):
                 train_flag=True, 
                 train_test_ratio=.8, 
                 normalization="min_max",
-                indices = None
+                indices = None,
+                seed = 12
                  ):
         super(FileWBDataset, self).__init__(
             train_flag=train_flag, 
             train_test_ratio=train_test_ratio,
             normalization=normalization,
-            indices=indices
+            indices=indices,
+            seed = seed
             )
 
         keys = []

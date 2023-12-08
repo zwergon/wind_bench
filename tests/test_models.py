@@ -5,6 +5,8 @@ import torch
 from wb.dataset import dataset
 from wb.virtual.models import get_model
 from wb.utils.config import Config
+from wb.virtual.context import Context
+
 
 class TestModel(unittest.TestCase):
 
@@ -13,11 +15,14 @@ class TestModel(unittest.TestCase):
         self.config = Config(os.path.join(os.path.dirname(__file__), "config.json"))
          
     def test_cnn(self):
+
+        context = Context(self.config)
+
         train_dataset, _ = dataset(self.config)
         X, y = train_dataset[0]
         print(X.shape, y.shape)
 
-        model =  get_model(train_dataset.input_size, train_dataset.output_size, self.config.__dict__ )
+        model =  get_model(context, train_dataset.input_size, train_dataset.output_size )
         print(model)
 
 
