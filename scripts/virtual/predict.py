@@ -37,18 +37,19 @@ def get_all_predicted(model, test_loader, y_test):
 
 def get_one_output(model, test_loader, index):
         model.eval()
+
+        dataset : FileWBDataset = test_loader.dataset
         inputs, actual = next(iter(test_loader))
         with torch.no_grad():
                 predicted = model(inputs)
 
+        if dataset.norma:
+                dataset.norma.unnorm_y(predicted)
+                dataset.norma.unnorm_y(actual)
+
         return actual[index, 0, :].numpy(), predicted[index, 0, :].numpy()
 
 
-def get_state_dict(args):
-
-        checkpoint = CheckPoint.load(args.checkpoint)
-       
-        return checkpoint.state_dict
 
 if __name__ == "__main__":
 
