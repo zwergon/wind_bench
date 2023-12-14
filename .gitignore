@@ -13,3 +13,4 @@ checkpoint*.pth
 mlruns
 azcopy*
 **/*.amltmp
+**/.ipynb_checkpoints
