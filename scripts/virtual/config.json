@@ -1,6 +1,6 @@
 {
     "project": "wb_virtual",
-    "tracking_uri": "/tmp/mplruns",
+    "tracking_uri": null,
     
     "normalization": true,
     "ratio_train_test": 0.9,

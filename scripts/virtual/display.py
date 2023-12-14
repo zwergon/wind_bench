@@ -15,7 +15,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset", help="path to parquet file")
     parser.add_argument("index", help="which element in the dataset", type=int)
-    parser.add_argument("-s", "--span", help="range in dataset to keep [1000:1500]", type=int, nargs='+', default=[1000, 1500])
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-s", "--span", help="range in dataset to keep [1000:1500]", type=int, nargs='+')
+    group.add_argument("-a", "--all", help="display all range of signal", action='store_true')
     parser.add_argument("-i", "--indices", help="output indices [0..6] (Default:0)", nargs='+', type=int, default=[0])
     parser.add_argument("-c", "--config", help="training config file", 
                         type=str, 
@@ -35,7 +37,6 @@ if __name__ == "__main__":
             indices=args.indices
             )
         
-
         print(f"train dataset (size) {len(dataset)}")
 
         X_idx, y_idx = dataset[args.index]
@@ -46,11 +47,18 @@ if __name__ == "__main__":
         fig, (ax1, ax2) = plt.subplots(2, 1)
         fig.suptitle( f"X (solid) versus y (dash) for idx:{args.index}")
 
+        if args.all:
+            deb = 0
+            end = X_idx.shape[1]-1
+        else:
+            deb = args.span[0]
+            end = args.span[1]
+
         for i in range(X_idx.shape[0]):
-            ax1.plot(X_idx[i, args.span[0]:args.span[1]])
+            ax1.plot(X_idx[i, deb:end])
 
         for i in range(y_idx.shape[0]):
-            ax2.plot(y_idx[i, args.span[0]:args.span[1]], "--")
+            ax2.plot(y_idx[i, deb:end], "--")
 
     
         plt.show()

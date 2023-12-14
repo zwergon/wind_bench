@@ -12,56 +12,46 @@ from wb.virtual.context import Context
 from wb.virtual.checkpoint import CheckPoint
 from wb.dataset import FileWBDataset
 
-def get_all_predicted(model, test_loader, y_test):
-        all_outputs = []
-        # Step 9: Perform prediction on the test set
-        model.eval()
-        with torch.no_grad():
-                for inputs, _ in test_loader:
-                        outputs = model(inputs)
-                        all_outputs.append(outputs)
+from sklearn.metrics import r2_score
 
-        # Combine all the outputs into a single array
-        predicted_outputs = torch.cat(all_outputs, dim=0)
-
-        # Convert predicted_outputs to a numpy array
-        predicted_outputs = predicted_outputs.numpy()
-
-        # Reshape predicted_outputs and y_test for plotting
-        predicted_outputs = predicted_outputs.reshape(-1, 1)
-        y_test = y_test.reshape(-1, 1)
-
-
-        return y_test, predicted_outputs
-
-
-def get_one_output(model, test_loader, index):
-        model.eval()
+def get_all_predicted(model, test_loader, norm):
 
         dataset : FileWBDataset = test_loader.dataset
-        inputs, actual = next(iter(test_loader))
+       
+        _, Y = dataset[0]
+        predicted = np.zeros(shape=(len(dataset), Y.shape[0], Y.shape[1]))
+        actual  = np.zeros(shape=(len(dataset), Y.shape[0], Y.shape[1]))
+        idx = 0
+        model.eval()
         with torch.no_grad():
-                predicted = model(inputs)
+                for X, Y in test_loader:
+                        Y_hat = model(X)
+                        if not norm and dataset.norma:
+                                dataset.norma.unnorm_y(Y_hat)
+                                dataset.norma.unnorm_y(Y)
 
-        if dataset.norma:
-                dataset.norma.unnorm_y(predicted)
-                dataset.norma.unnorm_y(actual)
+                        for i in range(Y.shape[0]):
+                                predicted[idx, :, :] = Y_hat[i, :, :]
+                                actual[idx, :, :] = Y[i, :, :]
+                                idx = idx + 1
 
-        return actual[index, 0, :].numpy(), predicted[index, 0, :].numpy()
-
+       
+        return predicted, actual
 
 
 if __name__ == "__main__":
 
-        offset = 10
       
         import argparse
         parser = argparse.ArgumentParser()
         parser.add_argument("dataset", help="path to parquet file")
         parser.add_argument("checkpoint", help="path to checkpoint")
         parser.add_argument("index", help="which element in the dataset", type=int)
-        parser.add_argument("-s", "--span", help="range in dataset to keep [1000:1500]", type=int, nargs='+', default=[1000, 1500])
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument("-s", "--span", help="range in dataset to keep [1000:1500]", type=int, nargs='+')
+        group.add_argument("-a", "--all", help="display all range of signal", action='store_true')
         parser.add_argument("-i", "--indices", help="output indices [0..6] (Default:0)", nargs='+', type=int, default=[0])
+        parser.add_argument("-n", "--norm", help="get predicted normalized", action='store_true', default=False)
         parser.add_argument("-c", "--config", help="training config file", 
                                 type=str, 
                                 default= os.path.join(os.path.dirname(__file__), "config.json")
@@ -85,24 +75,36 @@ if __name__ == "__main__":
             )
         test_loader = DataLoader(dataset, batch_size=1, shuffle=True)
         
-        X_test, y_test = next(iter(test_loader))
-        print(f"X_test : {X_test.shape}")
-        print(f"y_test : {y_test.shape}")
-    
-
+        _, y_test = next(iter(test_loader))
+        print(f"Number of predictions : {len(dataset)}")
+        print(f"Shape of predictions : {y_test.shape}")
         print(f"Type Network: {config.type}")
-        model = get_model(ctx, dataset.input_size, dataset.output_size)
-        
+
+
+        model = get_model(ctx, dataset.input_size, dataset.output_size)  
         model.load_state_dict(checkpoint.state_dict)
 
-        real_outputs, predicted_outputs = get_one_output(model, test_loader, args.index)
+        predicted, actual = get_all_predicted(model, test_loader=test_loader, norm=args.norm)
 
-        # Plot actual vs. predicted values
-        plt.figure(figsize=(9, 6))
-        plt.plot(real_outputs[args.span[0]:args.span[1]], label='Actual')
-        plt.plot(predicted_outputs[args.span[0]:args.span[1]], label='Predicted')
-        plt.xlabel('Time')
-        plt.ylabel(dataset.output_name(args.index))
-        plt.title('Actual vs. Predicted')
-        plt.legend()
+        if args.all:
+            deb = 0
+            end = actual.shape[2]
+        else:
+            deb = args.span[0]
+            end = args.span[1]
+
+      
+        
+        fig, axs =  plt.subplots(len(args.indices), sharex=True, squeeze=False)
+        print(axs)
+        fig.suptitle('Actual vs. Predicted')
+        for i, idx in enumerate(args.indices):
+                y = actual[args.index, i, deb:end]
+                y_hat = predicted[args.index, i, deb:end]
+
+                print(f"r2_score for {dataset.output_name(idx)}: {r2_score(y, y_hat)}")
+                axs[i][0].plot(y, label='Actual')
+                axs[i][0].plot(y_hat, label='Predicted')
+                axs[i][0].set_ylabel(dataset.output_name(idx))
+
         plt.show()
