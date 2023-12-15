@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.signal import butter, filtfilt
 
-from rainflow import rainflow
+from wb.post.rainflow import rainflow
 
 
 

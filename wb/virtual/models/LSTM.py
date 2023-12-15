@@ -11,9 +11,7 @@ class LSTMModel(nn.Module):
 
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bias=False, dropout=0.1)
         self.fc = nn.Linear(hidden_size, output_size)
-        self.sigmoid = nn.Sigmoid()
-        self.tanh = nn.Tanh()
-
+      
         
     def forward(self, x):
         x = torch.swapaxes(x, 1, 2)

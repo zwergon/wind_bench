@@ -112,7 +112,7 @@ def train_test(context: Context, model, train_loader, test_loader):
 
     scheduler = scheduler_function(optimizer)
 
-    predictions = Predictions(train_loader, device)
+    predictions = Predictions(test_loader)
 
     for epoch in range(num_epochs):
 
@@ -171,9 +171,10 @@ def train_test(context: Context, model, train_loader, test_loader):
     
         if epoch % 10 == 0:
             
-            predictions.compute(epoch, model)
+            predictions.compute(model, device=device)
             
-            context.report_prediction(predictions)
+
+            context.report_prediction(epoch, predictions)
 
             context.save_checkpoint(epoch=epoch, 
                                     model=model, 

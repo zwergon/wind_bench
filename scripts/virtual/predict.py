@@ -11,32 +11,12 @@ from wb.utils.config import Config
 from wb.virtual.context import Context
 from wb.virtual.checkpoint import CheckPoint
 from wb.dataset import FileWBDataset
+from wb.virtual.predictions import Predictions
+from wb.utils.display import predictions_plot
+from wb.post.eq_load import eq_load
+from wb.virtual.feature import Feature
 
 from sklearn.metrics import r2_score
-
-def get_all_predicted(model, test_loader, norm):
-
-        dataset : FileWBDataset = test_loader.dataset
-       
-        _, Y = dataset[0]
-        predicted = np.zeros(shape=(len(dataset), Y.shape[0], Y.shape[1]))
-        actual  = np.zeros(shape=(len(dataset), Y.shape[0], Y.shape[1]))
-        idx = 0
-        model.eval()
-        with torch.no_grad():
-                for X, Y in test_loader:
-                        Y_hat = model(X)
-                        if not norm and dataset.norma:
-                                dataset.norma.unnorm_y(Y_hat)
-                                dataset.norma.unnorm_y(Y)
-
-                        for i in range(Y.shape[0]):
-                                predicted[idx, :, :] = Y_hat[i, :, :]
-                                actual[idx, :, :] = Y[i, :, :]
-                                idx = idx + 1
-
-       
-        return predicted, actual
 
 
 if __name__ == "__main__":
@@ -74,7 +54,9 @@ if __name__ == "__main__":
             indices=args.indices
             )
         test_loader = DataLoader(dataset, batch_size=1, shuffle=True)
-        
+
+        predictions = Predictions(test_loader, norm=args.norm)
+
         _, y_test = next(iter(test_loader))
         print(f"Number of predictions : {len(dataset)}")
         print(f"Shape of predictions : {y_test.shape}")
@@ -84,27 +66,22 @@ if __name__ == "__main__":
         model = get_model(ctx, dataset.input_size, dataset.output_size)  
         model.load_state_dict(checkpoint.state_dict)
 
-        predicted, actual = get_all_predicted(model, test_loader=test_loader, norm=args.norm)
+        predictions.compute(model, ctx.device)
 
         if args.all:
             deb = 0
-            end = actual.shape[2]
+            end = predictions.actual.shape[2]
         else:
             deb = args.span[0]
             end = args.span[1]
 
-      
+        predictions_plot(predictions, index=args.index, span=[deb, end])
+        plt.show()
+
+        feature = Feature(eq_load)
+        feature.compute(predictions, m=3)
+       
+        print(f"r2score for DEL: {r2_score(feature.actual, feature.predicted)}")
+        plt.scatter(feature.actual, feature.predicted)
         
-        fig, axs =  plt.subplots(len(args.indices), sharex=True, squeeze=False)
-        print(axs)
-        fig.suptitle('Actual vs. Predicted')
-        for i, idx in enumerate(args.indices):
-                y = actual[args.index, i, deb:end]
-                y_hat = predicted[args.index, i, deb:end]
-
-                print(f"r2_score for {dataset.output_name(idx)}: {r2_score(y, y_hat)}")
-                axs[i][0].plot(y, label='Actual')
-                axs[i][0].plot(y_hat, label='Predicted')
-                axs[i][0].set_ylabel(dataset.output_name(idx))
-
         plt.show()

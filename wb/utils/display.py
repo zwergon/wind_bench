@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from wb.virtual.predictions import Predictions
+from wb.dataset import WBDataset
 
 def smooth(liste, beta=0.98):
     avg = 0.
@@ -33,4 +35,31 @@ def lrfind_plot(lr, loss):
     ax.set_xticks(np.array([np.arange(1,10)*10**(-8+i) for i in range(1,10)]).flatten())
     ax.set_ylim(0.95*min(trace), 1.05*max(trace))
     
+    return fig
+
+
+def predictions_plot( predictions: Predictions, index = 0, span=None):
+
+    if span is not None:
+         deb = span[0]
+         end = span[1]
+    else:
+         deb = 0
+         end = predictions.actual.shape[2]
+
+    dataset : WBDataset = predictions.loader.dataset
+
+    x_range = np.arange(deb, end, 1.)
+
+    fig, axs =  plt.subplots(dataset.output_size, sharex=True, squeeze=False)
+    fig.suptitle('Actual vs. Predicted')
+    for i in range(dataset.output_size):
+            y = predictions.actual[index, i, deb:end]
+            y_hat = predictions.predicted[index, i, deb:end]
+
+            axs[i][0].plot(x_range, y, label='Actual')
+            axs[i][0].plot(x_range, y_hat, label='Predicted')
+            axs[i][0].set_ylabel(dataset.output_name(i))
+            axs[i][0].legend()
+
     return fig

@@ -14,6 +14,7 @@ import numpy as np
 from wb.utils.config import Config
 from wb.virtual.checkpoint import CheckPoint
 from wb.virtual.predictions import Predictions
+from wb.utils.display import predictions_plot
 
 
 class Context:
@@ -105,14 +106,10 @@ class Context:
         mlflow.log_metrics( values, step=epoch)
       
 
-    def report_prediction(self, predictions: Predictions):
-        for data in predictions.predictions:
-            fig, ax = plt.subplots()
-            ax.plot(data['predicted'])
-            ax.plot(data['actual'])
-            ax.set_ylabel(data['y_label'])
-            mlflow.log_figure(fig, data['file'])
-            plt.close(fig)
+    def report_prediction(self, epoch, predictions: Predictions, index=0):
+        fig = predictions_plot(predictions=predictions)
+        mlflow.log_figure(fig, f"actual_predicted_{epoch}.png")
+        plt.close(fig)
 
 
     def report_lr_find(self, lr, losses):

@@ -6,16 +6,14 @@
     "ratio_train_test": 0.9,
     "num_workers": 2,
 
-    "type": "LSTM",
+    "type": "RNN",
     "hidden_size": 80, 
     "num_layers": 3, 
     "kernel_size": 5,
     "dropout": 0,
     
-    "loss":"MAE",
+    "loss":"MSE",
     "optimizer": "Adam",
-    "alpha":0.3,
-    "gamma":0.005,
     "cuda": true
 
 }
