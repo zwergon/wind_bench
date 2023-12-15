@@ -7,7 +7,7 @@ from wb.virtual.models.LSTM import LSTMModel
 from wb.virtual.models.CNN import CNNModel
 from wb.virtual.models.MLP import MLPModel
 from wb.virtual.models.RNN  import RNNVanilla
-
+from wb.virtual.models.UNet1D import UNet1D
 def get_model(context: Context, input_size, output_size):
      
     config = context.config
@@ -48,6 +48,13 @@ def get_model(context: Context, input_size, output_size):
             output_size,
             config['dropout']
             )
+    
+    elif kind == "UNET1D":
+        model = UNet1D(
+            input_size,
+            output_size,
+            kernel = config["kernel_size"]
+        )
     
     else:
         raise Exception(f"model of type {kind} is not handled")
