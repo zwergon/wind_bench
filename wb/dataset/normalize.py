@@ -1,8 +1,6 @@
-
-
-import json
 import numpy as np
 from enum import IntEnum
+
 
 class NormalizationType(IntEnum):
     Standard = 1
@@ -22,7 +20,7 @@ class Scaling:
     Base class that uses statistics to normalize between [0, 1] or standardize
     """
 
-    fields = ['min', 'max', 'mean', 'std']
+    fields = ["min", "max", "mean", "std"]
 
     @staticmethod
     def create(kind: str, stats, x_columns, y_columns):
@@ -33,10 +31,9 @@ class Scaling:
             scaling = Normalize(stats, x_columns=x_columns, y_columns=y_columns)
         else:
             print(f"no way to normalize with {kind} kind -> not normalizing!")
-            
+
         return scaling
 
- 
     def __init__(self, stats, x_columns, y_columns) -> None:
         self.data = stats
         self.wx = np.zeros(shape=(len(Normalize.fields), len(x_columns)))
@@ -47,9 +44,9 @@ class Scaling:
             for col, d in enumerate(y_columns):
                 self.wy[row, col] = self.data[d][f]
 
-    def value(self, name, field ):
-       return self.data[name][field]
-    
+    def value(self, name, field):
+        return self.data[name][field]
+
     def norm_x(self, X):
         pass
 
@@ -65,12 +62,11 @@ class Normalize(Scaling):
     Base class that uses statistics to normalize between [0, 1] or standardize
     """
 
-    fields = ['min', 'max', 'mean', 'std']
- 
+    fields = ["min", "max", "mean", "std"]
+
     def __init__(self, stats, x_columns, y_columns) -> None:
         super().__init__(stats, x_columns, y_columns)
 
- 
     def norm_x(self, X):
         for i in range(X.shape[0]):
             X[i, :] = (X[i, :] - self.wx[OpType.MEAN, i]) / self.wx[OpType.STD, i]
@@ -81,23 +77,31 @@ class Normalize(Scaling):
 
     def unnorm_y(self, Y):
         for i in range(Y.shape[0]):
-            Y[i, :] = Y[i, :] * self.wy[OpType.STD, i]  + self.wy[OpType.MEAN, i]
-    
+            Y[i, :] = Y[i, :] * self.wy[OpType.STD, i] + self.wy[OpType.MEAN, i]
+
+
 class MinMax(Scaling):
     def __init__(self, stats, x_columns, y_columns) -> None:
         super().__init__(stats, x_columns, y_columns)
 
     def norm_x(self, X):
         for i in range(X.shape[0]):
-            X[i, :] = (X[i, :] - self.wx[OpType.MIN, i]) / (self.wx[OpType.MAX, i] - self.wx[OpType.MIN, i])
+            X[i, :] = (X[i, :] - self.wx[OpType.MIN, i]) / (
+                self.wx[OpType.MAX, i] - self.wx[OpType.MIN, i]
+            )
 
     def norm_y(self, Y):
         for i in range(Y.shape[0]):
-            Y[i, :] = (Y[i, :] - self.wy[OpType.MIN, i]) / (self.wy[OpType.MAX, i] - self.wy[OpType.MIN, i])
+            Y[i, :] = (Y[i, :] - self.wy[OpType.MIN, i]) / (
+                self.wy[OpType.MAX, i] - self.wy[OpType.MIN, i]
+            )
 
     def unnorm_y(self, Y):
-         for i in range(Y.shape[0]):
-            Y[i, :] = Y[i, :]*(self.wy[OpType.MAX, i] - self.wy[OpType.MIN, i]) +  self.wy[OpType.MIN, i]
+        for i in range(Y.shape[0]):
+            Y[i, :] = (
+                Y[i, :] * (self.wy[OpType.MAX, i] - self.wy[OpType.MIN, i])
+                + self.wy[OpType.MIN, i]
+            )
 
 
 # TODO

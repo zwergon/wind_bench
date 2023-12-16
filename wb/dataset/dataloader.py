@@ -10,11 +10,11 @@ class NaiveDataLoader:
     def __iter__(self):
         self.index = 0
         return self
-    
+
     def collate_fn(self, batch):
         X, y = batch[0]
-        x_batch = torch.zeros(len(batch), X.shape[0], X.shape[1], dtype=torch.float32 )
-        y_batch = torch.zeros(len(batch), y.shape[0], y.shape[1], dtype=torch.float32 )
+        x_batch = torch.zeros(len(batch), X.shape[0], X.shape[1], dtype=torch.float32)
+        y_batch = torch.zeros(len(batch), y.shape[0], y.shape[1], dtype=torch.float32)
         for i, item in enumerate(batch):
             X, y = item
             x_batch[i, :, :] = torch.from_numpy(X)

@@ -1,15 +1,10 @@
-
-
 import os
 import torch
 import uuid
 import mlflow
-from mlflow.models import infer_signature
 import tempfile
 
-
 import matplotlib.pyplot as plt
-import numpy as np
 
 from wb.utils.config import Config
 from wb.virtual.checkpoint import CheckPoint
@@ -18,7 +13,6 @@ from wb.utils.display import predictions_plot
 
 
 class Context:
-
     @staticmethod
     def _experiment_name(root_name):
         return f"{root_name}_{str(uuid.uuid1())[:8]}"
@@ -28,17 +22,20 @@ class Context:
         self.experiment_id = None
         self.checkpoint = checkpoint
 
-        self.device = torch.device("cuda" if config.cuda and torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda" if config.cuda and torch.cuda.is_available() else "cpu"
+        )
 
     def __enter__(self):
+        if self.config["tracking_uri"]:
+            mlflow.set_tracking_uri(self.config["tracking_uri"])
+            self.experiment_id = mlflow.create_experiment(
+                self._experiment_name(self.config["project"])
+            )
 
-        if self.config['tracking_uri']:
-            mlflow.set_tracking_uri(self.config['tracking_uri'])
-            self.experiment_id = mlflow.create_experiment(self._experiment_name(self.config['project']))
-     
         mlflow.start_run(experiment_id=self.experiment_id)
         mlflow.log_params(self.config)
-        
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -50,7 +47,7 @@ class Context:
 
     def close(self):
         mlflow.end_run()
-        
+
     def summary(self, train_loader, test_loader):
         print(f"Device : {self.device}")
         active_run = mlflow.active_run()
@@ -64,37 +61,35 @@ class Context:
         print(f"X_train : {X_train.shape}")
         print(f"y_train : {y_train.shape}")
         print(f"X_test : {X_test.shape}")
-        print(f"y_test : {y_test.shape}") 
-
+        print(f"y_test : {y_test.shape}")
 
     def save_checkpoint(self, epoch, model, optimizer, loss):
         with tempfile.TemporaryDirectory() as tmpdirname:
             ckp_name = os.path.join(tmpdirname, f"checkpoint_{epoch}_{loss:.2f}.pth")
             self.checkpoint.save(
-                            ckp_name,
-                            epoch=epoch, 
-                            model=model, 
-                            optimizer=optimizer, 
-                            loss=loss
-                            )
-        
+                ckp_name, epoch=epoch, model=model, optimizer=optimizer, loss=loss
+            )
+
             mlflow.log_artifact(local_path=ckp_name, artifact_path="checkpoints")
 
-
     def report_loss(self, epoch, train_loss, lr, test_loss=None, step=10):
-        num_epochs = self.config['epochs']
+        num_epochs = self.config["epochs"]
 
-        losses = { "train_loss": train_loss, "lr": lr }
+        losses = {"train_loss": train_loss, "lr": lr}
         if test_loss is not None:
-            losses['test_loss'] = test_loss
-        mlflow.log_metrics( losses, step=epoch )
+            losses["test_loss"] = test_loss
+        mlflow.log_metrics(losses, step=epoch)
 
         if step is None or epoch % step == 0:
             if test_loss is None:
-                print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, lr {lr:.2e}")
+                print(
+                    f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, lr {lr:.2e}"
+                )
             else:
-                print(f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f}, lr {lr:.2e}")
- 
+                print(
+                    f"Epoch {epoch}/{num_epochs} - Loss: train {train_loss:.6f}, test {test_loss:.6f}, lr {lr:.2e}"
+                )
+
     def report_metrics(self, epoch, metrics):
         values = {}
         for k, v in metrics.results.items():
@@ -103,20 +98,16 @@ class Context:
             else:
                 for c in range(v.shape[0]):
                     values[f"{k}_{c}"] = v[c].item()
-        mlflow.log_metrics( values, step=epoch)
-      
+        mlflow.log_metrics(values, step=epoch)
 
     def report_prediction(self, epoch, predictions: Predictions, index=0):
         fig = predictions_plot(predictions=predictions)
         mlflow.log_figure(fig, f"actual_predicted_{epoch}.png")
         plt.close(fig)
 
-
     def report_lr_find(self, lr, losses):
         from wb.utils.display import lrfind_plot
 
         fig = lrfind_plot(lr, losses)
-        mlflow.log_figure(fig, f"lr_find.png")
+        mlflow.log_figure(fig, "lr_find.png")
         plt.close(fig)
-            
-  

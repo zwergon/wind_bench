@@ -4,7 +4,6 @@ import os
 import time
 from timeit import default_timer
 
-import matplotlib.pyplot as plt
 import numpy as np
 import psutil
 
@@ -19,6 +18,7 @@ class Timer:
     >>> print(timer)
     00:00:01
     """
+
     def __init__(self):
         self.start = None
         self.elapsed = None
@@ -38,25 +38,26 @@ class Timer:
 
     def verbose(self):
         if self.elapsed is None:
-            return '<not-measured>'
+            return "<not-measured>"
         return self.format_elapsed_time(self.elapsed)
 
     @staticmethod
     def format_elapsed_time(value: float):
-        return time.strftime('%H:%M:%S', time.gmtime(value))
-    
-    
+        return time.strftime("%H:%M:%S", time.gmtime(value))
+
+
 class MemoryTrackingProcess(Process):
     """A process that periodically measures the amount of RAM consumed by another process.
-    
+
     This process is stopped as soon as the event is set.
     """
+
     def __init__(self, pid, event, **kwargs):
         super().__init__()
         self.p = psutil.Process(pid)
         self.event = event
-        self.max_mem = Value('f', 0.0)
-        
+        self.max_mem = Value("f", 0.0)
+
     def run(self):
         mem_usage = []
         while not self.event.is_set():
@@ -68,31 +69,32 @@ class MemoryTrackingProcess(Process):
 
 
 class MemoryTracker:
-    """A context manager that runs MemoryTrackingProcess in background and collects 
+    """A context manager that runs MemoryTrackingProcess in background and collects
     the information about used memory when the context is exited.
     """
+
     def __init__(self, pid=None):
         pid = pid or os.getpid()
         self.start_mem = psutil.Process(pid).memory_info().rss
         self.event = Event()
         self.p = MemoryTrackingProcess(pid, self.event)
-    
+
     @property
     def memory(self):
         return self.p.max_mem.value - self.start_mem
-    
+
     def __enter__(self):
         self.p.start()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.event.set()
         self.p.join()
 
-        
+
 class GC:
     def __enter__(self):
         return self
+
     def __exit__(self, exc_type, exc_val, ext_tb):
         self.collected = gc.collect()
-        

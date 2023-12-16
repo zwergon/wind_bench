@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
+
 
 # Step 4: Define the LSTM model
 class LSTMModel(nn.Module):
@@ -9,10 +9,16 @@ class LSTMModel(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
 
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bias=False, dropout=0.1)
+        self.lstm = nn.LSTM(
+            input_size,
+            hidden_size,
+            num_layers,
+            batch_first=True,
+            bias=False,
+            dropout=0.1,
+        )
         self.fc = nn.Linear(hidden_size, output_size)
-      
-        
+
     def forward(self, x):
         x = torch.swapaxes(x, 1, 2)
 
