@@ -36,7 +36,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: set pythonpath
       run: |
-        echo "PYTHONPATH=mlprepare" >> $GITHUB_ENV
+        echo "----PYTHONPATH------"
+        PWD=$(pwd)
+        export PYTHONPATH=$PWD:$PYTHONPATH
+        echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
         pytest
