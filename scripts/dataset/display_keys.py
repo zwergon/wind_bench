@@ -1,16 +1,15 @@
-
 import os
 import sys
-sys.path.append(os.getcwd())
+import argparse
 from wb.dataset import FileWBDataset
 
-if __name__ == "__main__":
+sys.path.append(os.getcwd())
 
-    import argparse
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="input parquet file")
     args = parser.parse_args()
-    
 
     dataset = FileWBDataset(args.input, train_flag=True)
 
@@ -21,5 +20,3 @@ if __name__ == "__main__":
 
     print(f"test dataset (size) {len(test_dataset)}")
     print(test_dataset.partition_keys)
-
-
