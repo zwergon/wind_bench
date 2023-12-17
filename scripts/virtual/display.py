@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 from wb.utils.config import Config
 from wb.dataset import FileWBDataset
-from wb.virtual.context import Context
 
 sys.path.append(os.getcwd())
 
