@@ -77,11 +77,10 @@ number of parameters.
 
 A 7-D sample space with 6 environmental variables and one operational
 (yaw misalignment) was sampled to provide environmental condition bounds
-for load simulations. As an illustration, Fig.[fig:DoE~7~D~p~airplot]
+for load simulations. As an illustration this <a href='#fig:doe:pairplot'> figure</a>
 illustrates how experimental space is sampled in the benchmark design.
 
-![7-D sample space](image/DoE_7D_pairplot.png "fig:")
-[fig:DoE~7~D~p~airplot]
+<a id='fig:doe:pairplot'>![7-D sample space](image/DoE_7D_pairplot.png)</a>
 
 Neural Networks
 ===============
