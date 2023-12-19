@@ -82,78 +82,7 @@ illustrates how experimental space is sampled in the benchmark design.
 
 <a id='fig:doe:pairplot'>![7-D sample space](image/DoE_7D_pairplot.png)</a>
 
-Neural Networks
-===============
-
-To establish connections between the input signals and the signals
-targeted for prediction, various types of neural networks were employed
-in our approach, including convolutional neural networks (CNNs) and
-recurrent neural networks (RNNs). The utilization of these neural
-network architectures facilitates the extraction and understanding of
-complex patterns within the data, contributing to the effectiveness of
-the predictive model.In the subsequent sections, we will delve into a
-detailed presentation of each neural network employed in our study.
-
-Recurrent Neural Network
-------------------------
-
-Recurrent neural networks (RNN) are a class of deep learning models
-designed to process sequential data. Unlike traditional neural networks,
-RNN store previous information and use it to influence the processing of
-new data.
-
-![Hidden state of a RNN memory cell](image/image6.png)
-
-Long Short-Term Memory
-----------------------
-
-Long Short-Term Memory is a type of recurrent neural networks that was
-created to bypass the vanishing gradient problem, a challenge that
-arises during the training of traditional RNNs. A cell of LSTM network
-is maindly composed to 3 parts:
-
--   **Forget Gate:** in this part of the cell, some information
-    previously stored in memory is intentionally erased.This gate
-    enables the LSTM to discard irrelevant or outdated information,
-    allowing the network to focus on more relevant data.
-
--   **Input Gate:** This part of the LSTM cell is responsible for
-    incorporating new information into the cell’s memory. The input gate
-    regulates the flow of incoming information, determining which data
-    is important to retain and add to the existing memory.
-
--   **Output Gate:** The output controls the flow of information that is
-    passed on to the next layer of the neural network or that used as
-    the final output.
-
-![Exemple of LSTM Network](image/image10.png)
-
-Convolutional Neural Network
-----------------------------
-
-Convolutional neural networks (CNNs) are a type of neural network
-designed primarily for processing grid-structured data, such as images.
-They use convolution layers to extract meaningful features, such as
-contours and patterns, from input data. This approach allows CNNs to
-capture local information while maintaining a certain hierarchy in the
-extracted characteristics. Due to their ability to learn complex models
-from spatial data, CNNs are commonly used in areas such as computer
-vision for tasks such as image classification and object detection.
-
-![Exemple of using CNN](image/image11.png)
-
-U-Net
------
-
-U-Net is a neural network architecture used primarily for image
-segmentation. Its U-shaped structure incorporates an encoder to extract
-features and a decoder to reconstruct the segmented image. Direct
-connections between layers preserve contextual information, making it a
-popular choice for accurate image segmentation.
-
-![Exemple of a U-net structure](image/image12.png)
-
-Data Processing
+Datasets
 ===============
 
 As mentioned, DTU has provided a set of outputs supplied by `OpenFast`
@@ -185,7 +114,7 @@ by OpenFast (i.e. 12,000 points per signal).
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
-      <th>Time (s)</th>
+      <th>Time [s]</th>
       <th>Rotor azimuth [deg]</th>
       <th>Rotor rotational speed [rpm]</th>
       <th>Blade 1 pitch angle [deg]</th>
@@ -299,7 +228,69 @@ signals are as follows:
     around the vertical axis at mid-height of the tower, expressed in
     degrees.
 
-![Input Signals](image/image2.png)
+<a id="tab:input">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Time [s]</th>
+      <th>Tower top fore-aft acceleration ay [m/s2]</th>
+      <th>Tower top side-side acceleration ax [m/s2]</th>
+      <th>Tower mid fore-aft acceleration ay [m/s2]</th>
+      <th>Tower mid side-side acceleration ax [m/s2]</th>
+      <th>Tower top rotation x [deg]</th>
+      <th>Tower top rotation y [deg]</th>
+      <th>Tower mid rotation x [deg]</th>
+      <th>Tower mid rotation y [deg]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.00</th>
+      <td>-0.089793</td>
+      <td>0.292771</td>
+      <td>-0.451854</td>
+      <td>-0.271650</td>
+      <td>0.46575</td>
+      <td>-0.221151</td>
+      <td>0.421875</td>
+      <td>-0.070203</td>
+    </tr>
+    <tr>
+      <th>0.05</th>
+      <td>-0.029697</td>
+      <td>0.171801</td>
+      <td>-0.566831</td>
+      <td>-0.179218</td>
+      <td>0.46125</td>
+      <td>-0.217698</td>
+      <td>0.421875</td>
+      <td>-0.069329</td>
+    </tr>
+    <tr>
+      <th>0.10</th>
+      <td>0.013529</td>
+      <td>0.040707</td>
+      <td>-0.563472</td>
+      <td>-0.054931</td>
+      <td>0.46125</td>
+      <td>-0.213114</td>
+      <td>0.421875</td>
+      <td>-0.068388</td>
+    </tr>
+      <tr>
+      <th>up to 12000 rows...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+  </tbody>
+</table>
+</a>
 
 Target signals
 --------------
@@ -325,20 +316,190 @@ predict 6 signals. The different signals. These signals are as follows:
 -   **Waterline moment Mz[KNm]:** This is the moment around the axis Z
     of waterline, expressed in kilonewton-meter.
 
-![Target Signals](image/Capture17.png)
+<a id="tab:target">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Time [s]</th>
+      <th>Mudline moment Mx[kNm]</th>
+      <th>Mudline moment My[kNm]</th>
+      <th>Mudline moment Mz[kNm]</th>
+      <th>Waterline moment Mx[kNm]</th>
+      <th>Waterline moment My[kNm]</th>
+      <th>Waterline moment Mz[kNm]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.00</th>
+      <td>122300.083752</td>
+      <td>11632.042227</td>
+      <td>7655.904384</td>
+      <td>264567.690504</td>
+      <td>31845.901568</td>
+      <td>7621.016674</td>
+    </tr>
+    <tr>
+      <th>0.05</th>
+      <td>123523.029784</td>
+      <td>11946.845293</td>
+      <td>7401.308883</td>
+      <td>264999.483360</td>
+      <td>32185.395920</td>
+      <td>7372.876025</td>
+    </tr>
+    <tr>
+      <th>0.10</th>
+      <td>123776.701048</td>
+      <td>12655.058163</td>
+      <td>6810.098925</td>
+      <td>264169.798740</td>
+      <td>32897.378960</td>
+      <td>6827.471046</td>
+    </tr>
+      <tr>
+      <th>up to 12000 rows...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+  </tbody>
+</table>
+</a>
 
-input and target Signals normalization
+Normalization
 --------------------------------------
+Let's take a look at the statistical description of input and target signals
 
-![statistical description of input signals ](image/image7.png)
 
-![statistical description of target signals ](image/image8.png)
+### Input Statistics
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Tower top fore-aft acceleration ay [m/s2]</th>
+      <th>Tower top side-side acceleration ax [m/s2]</th>
+      <th>Tower mid fore-aft acceleration ay [m/s2]</th>
+      <th>Tower mid side-side acceleration ax [m/s2]</th>
+      <th>Tower top rotation x [deg]</th>
+      <th>Tower top rotation y [deg]</th>
+      <th>Tower mid rotation x [deg]</th>
+      <th>Tower mid rotation y [deg]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>mean</th>
+      <td>0.002137</td>
+      <td>-0.000770</td>
+      <td>0.000450</td>
+      <td>-0.000307</td>
+      <td>0.390212</td>
+      <td>-0.184182</td>
+      <td>0.373969</td>
+      <td>-0.052710</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>0.134382</td>
+      <td>0.139669</td>
+      <td>0.290012</td>
+      <td>0.162966</td>
+      <td>0.064641</td>
+      <td>0.014259</td>
+      <td>0.033061</td>
+      <td>0.008070</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>-0.331137</td>
+      <td>-0.528690</td>
+      <td>-0.861611</td>
+      <td>-0.543853</td>
+      <td>0.230625</td>
+      <td>-0.224915</td>
+      <td>0.294750</td>
+      <td>-0.075000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>0.392174</td>
+      <td>0.359047</td>
+      <td>0.763519</td>
+      <td>0.484980</td>
+      <td>0.528750</td>
+      <td>-0.153350</td>
+      <td>0.433125</td>
+      <td>-0.034805</td>
+    </tr>
+  </tbody>
+</table>
 
-When we look at the statistical description of input and target signals
-, we remark that the mean values are all different; some values are
+
+### Target Statistics
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Mudline moment Mx[kNm]</th>
+      <th>Mudline moment My[kNm]</th>
+      <th>Mudline moment Mz[kNm]</th>
+      <th>Waterline moment Mx[kNm]</th>
+      <th>Waterline moment My[kNm]</th>
+      <th>Waterline moment Mz[kNm]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>mean</th>
+      <td>103474.724264</td>
+      <td>9534.993099</td>
+      <td>99.795798</td>
+      <td>232941.854360</td>
+      <td>24580.950652</td>
+      <td>99.781762</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>9115.613425</td>
+      <td>2567.477798</td>
+      <td>3566.809877</td>
+      <td>19625.576972</td>
+      <td>5260.768656</td>
+      <td>3556.660551</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>77001.755600</td>
+      <td>3357.899366</td>
+      <td>-12870.842835</td>
+      <td>184043.675664</td>
+      <td>12052.194208</td>
+      <td>-12810.351074</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>123776.701048</td>
+      <td>16756.273888</td>
+      <td>8550.295853</td>
+      <td>271114.169796</td>
+      <td>39416.365136</td>
+      <td>8518.574790</td>
+    </tr>
+  </tbody>
+</table>
+
+It can be noticed that the mean values are all different; some values are
 close to 0 and others exceed 10000. The signals are of different scales,
 which may be a problem for the neural network, so it is necessary to
-normalize them. The normalization method consists in applying the
+normalize them. 
+
+#### MinMax normalization
+
+The __minmax__ normalization method consists in applying the
 following formula on each signal:
 
 $$
@@ -362,7 +523,89 @@ evaluate the model’s ability to generalize data not used during
 training, thus contributing to evaluate its performance on unpublished
 data.
 
-![representation of training and test data](image/image19.png)
+
+
+### Summary
+
+At the end, what we want is to find a black box ( a surrogate model ) that, once it learned, can deduced the target signal given the input signals.
+
+![Virtual Sensing](image/virtual_sensing_aim.png)
+
+
+#### Shape considerations
+
+
+Neural Networks
+===============
+
+To establish connections between the input signals and the signals
+targeted for prediction, various types of neural networks were employed
+in our approach, including convolutional neural networks (CNNs) and
+recurrent neural networks (RNNs). The utilization of these neural
+network architectures facilitates the extraction and understanding of
+complex patterns within the data, contributing to the effectiveness of
+the predictive model.In the subsequent sections, we will delve into a
+detailed presentation of each neural network employed in our study.
+
+Recurrent Neural Network
+------------------------
+
+Recurrent neural networks (RNN) are a class of deep learning models
+designed to process sequential data. Unlike traditional neural networks,
+RNN store previous information and use it to influence the processing of
+new data.
+
+![Hidden state of a RNN memory cell](image/image6.png)
+
+Long Short-Term Memory
+----------------------
+
+Long Short-Term Memory is a type of recurrent neural networks that was
+created to bypass the vanishing gradient problem, a challenge that
+arises during the training of traditional RNNs. A cell of LSTM network
+is maindly composed to 3 parts:
+
+-   **Forget Gate:** in this part of the cell, some information
+    previously stored in memory is intentionally erased.This gate
+    enables the LSTM to discard irrelevant or outdated information,
+    allowing the network to focus on more relevant data.
+
+-   **Input Gate:** This part of the LSTM cell is responsible for
+    incorporating new information into the cell’s memory. The input gate
+    regulates the flow of incoming information, determining which data
+    is important to retain and add to the existing memory.
+
+-   **Output Gate:** The output controls the flow of information that is
+    passed on to the next layer of the neural network or that used as
+    the final output.
+
+![Exemple of LSTM Network](image/image10.png)
+
+Convolutional Neural Network
+----------------------------
+
+Convolutional neural networks (CNNs) are a type of neural network
+designed primarily for processing grid-structured data, such as images.
+They use convolution layers to extract meaningful features, such as
+contours and patterns, from input data. This approach allows CNNs to
+capture local information while maintaining a certain hierarchy in the
+extracted characteristics. Due to their ability to learn complex models
+from spatial data, CNNs are commonly used in areas such as computer
+vision for tasks such as image classification and object detection.
+
+![Exemple of using CNN](image/image11.png)
+
+U-Net
+-----
+
+U-Net is a neural network architecture used primarily for image
+segmentation. Its U-shaped structure incorporates an encoder to extract
+features and a decoder to reconstruct the segmented image. Direct
+connections between layers preserve contextual information, making it a
+popular choice for accurate image segmentation.
+
+![Exemple of a U-net structure](image/image12.png)
+
 
 Network structures
 ==================
