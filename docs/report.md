@@ -181,9 +181,86 @@ the last 10 minutes sampled at 20Hz from one of the 147 outputs provided
 by OpenFast (i.e. 12,000 points per signal).
 
 
-<a id="datastructure">![Data Structure](image/image1.png)</a>
+<a id="datastructure">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Time (s)</th>
+      <th>Rotor azimuth [deg]</th>
+      <th>Rotor rotational speed [rpm]</th>
+      <th>Blade 1 pitch angle [deg]</th>
+      <th>...</th>
+      <th>Free wind speed Vy pos  -55.00,   0.00, -95.00</th>
+      <th>Free wind speed Vz pos  -55.00,   0.00, -95.00</th>
+      <th>Water surface elevation [m]</th>
+    </tr>
+</thead>
+  <tbody>
+    <tr>
+      <th>0.00</th>
+      <td>66.556067</td>
+      <td>7.672028</td>
+      <td>0.520026</td>
+      <td>...</td>
+      <td>11.832829</td>
+      <td>0.599726</td>
+      <td>-0.058321</td>
+      </tr>
+    <tr>
+      <th>0.05</th>
+      <td>68.860026</td>
+      <td>7.677732</td>
+      <td>0.528227</td>
+      <td>...</td>
+      <td>11.840616</td>
+      <td>0.539415</td>
+      <td>-0.098596</td>
+      </tr>
+    <tr>
+      <th>0.10</th>
+      <td>71.166235</td>
+      <td>7.679375</td>
+      <td>0.536139</td>
+      <td>...</td>
+      <td>11.845533</td>
+      <td>0.438913</td>
+      <td>-0.142723</td>
+    </tr>
+    <tr>
+      <th>0.15</th>
+      <td>73.470194</td>
+      <td>7.677345</td>
+      <td>0.543834</td>
+      <td>...</td>
+      <td>11.833485</td>
+      <td>0.328324</td>
+      <td>-0.188766</td>
+      </tr>
+    <tr>
+      <th>0.20</th>
+      <td>75.767403</td>
+      <td>7.673720</td>
+      <td>0.551354</td>
+      <td>...</td>
+      <td>11.810534</td>
+      <td>0.216735</td>
+      <td>-0.237811</td>
+    </tr>
+      <tr>
+      <th>up to 12000 rows...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>-...</td>
+    </tr>
+  </tbody>
+</table>
+</a>
 
-The data structure is illustrated <a href="#datastructure">fig</a>
+The data structure for one of these 1000 samples is given <a href="#datastructure">fig</a> for the first `id=Exp0`. All 147 signals are sampled each 50ms during 10 minutes.
 
 Input signals
 -------------
@@ -264,8 +341,9 @@ which may be a problem for the neural network, so it is necessary to
 normalize them. The normalization method consists in applying the
 following formula on each signal:
 
-$$\begin{aligned}
-x_{ij}^{(normalize)}=\frac{x_{ij}-x_{j}^{(min)}}{x_{j}^{(max)}-x_{j}^{(min)}} \\\end{aligned}$$
+$$
+x_{ij}^{(normalize)}=\frac{x_{ij}-x_{j}^{(min)}}{x_{j}^{(max)}-x_{j}^{(min)}} 
+$$
 
 with $x_{ij}$ the i-th value of the j-th signal, $x_{j}^{(max)}$ the
 highest value of the j-th signal and $x_{j}^{(min)}$ the smallest value
@@ -308,8 +386,9 @@ taking the mean of the squares of the differences between the values
 predicted by the model and the actual values. The mathematical formula
 of the MSE for a dataset of size $n$ is as follows:
 
-$$\begin{aligned}
-MSE=\frac{\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^2}{n}\end{aligned}$$
+$$
+MSE=\frac{\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^2}{n}
+$$
 
 Selection of Hyperparameters and functions
 ------------------------------------------
