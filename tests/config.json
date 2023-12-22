@@ -1,6 +1,5 @@
 {
     "normalization": true,
-    "file": "wind_bench.parquet",
     "ratio_train_test": 0.1,
     "type": "CNN",
     "hidden_size": 10,

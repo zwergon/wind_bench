@@ -1,5 +1,4 @@
 import unittest
-import os
 
 from wb.dataset.sensor_description import SensorDescr
 

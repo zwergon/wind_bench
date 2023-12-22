@@ -7,7 +7,6 @@ import pandas as pd
 from torch.utils.data import Dataset
 
 from wb.dataset.normalize import Scaling
-from wb.utils.config import Config, FSType, FileType
 from wb.dataset.sensor_description import SensorDescr
 
 
