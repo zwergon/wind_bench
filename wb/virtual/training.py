@@ -160,8 +160,8 @@ def train_test(context: Context, model, train_loader, test_loader):
             context.report_prediction(epoch, predictions)
 
             context.save_checkpoint(
-                epoch=epoch, 
-                model=model, 
-                optimizer=optimizer, 
+                epoch=epoch,
+                model=model,
+                optimizer=optimizer,
                 loss=test_loss
             )

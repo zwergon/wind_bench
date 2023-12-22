@@ -24,5 +24,4 @@ class CheckPoint:
         self.params["loss"] = loss
         self.params["model_state_dict"] = model.state_dict()
         self.params["optimizer_state_dict"] = optimizer.state_dict()
-        
         torch.save(self.params, filename)
