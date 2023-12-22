@@ -10,10 +10,6 @@ class TestConfig(unittest.TestCase):
 
     def test_config(self):
         config = Config(os.path.join(os.path.dirname(__file__), "config.json"))
-        print(config.learning_rate)
-        print(config.type)
-        print(config.data_dir)
-        print(config.name)
         self.assertTrue(config is not None)
 
 

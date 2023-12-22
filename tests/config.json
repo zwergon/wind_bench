@@ -1,10 +1,7 @@
 {
-    "n_samples": 100,
     "normalization": true,
-    "root_path": "file://./data",
     "file": "wind_bench.parquet",
     "ratio_train_test": 0.1,
-    "sequence_length": 128,
     "type": "CNN",
     "hidden_size": 10,
     "num_layers": 1,

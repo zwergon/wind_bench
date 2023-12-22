@@ -16,10 +16,10 @@ def main():
     parser.add_argument("index", help="which element in the dataset", type=int)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "-s", "--span", help="range in dataset to keep [1000:1500]", type=int, nargs="+"
+        "-s", "--span", help="range in timeserie to keep [S1, S2]", type=int, nargs=2
     )
     group.add_argument(
-        "-a", "--all", help="display all range of signal", action="store_true"
+        "-a", "--all", help="display all timeserie (fullrange)", action="store_true"
     )
     parser.add_argument(
         "-i",
@@ -36,6 +36,13 @@ def main():
         type=str,
         default=os.path.join(os.path.dirname(__file__), "config.json"),
     )
+    parser.add_argument(
+        "-n",
+        "--norm",
+        help="display normalized",
+        choices=["none", "min_max"],
+        default="min_max",
+    )
     args = parser.parse_args()
 
     # INPUT Parameters
@@ -46,6 +53,8 @@ def main():
         train_flag=True,
         train_test_ratio=config.ratio_train_test,
         indices=args.indices,
+        sensor_desc=config.sensors,
+        normalization=args.norm,
     )
 
     print(f"train dataset (size) {len(dataset)}")

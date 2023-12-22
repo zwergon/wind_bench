@@ -2,7 +2,7 @@ import unittest
 import os
 import torch
 
-from wb.dataset import dataset
+from wb.dataset import FileWBDataset
 from wb.virtual.models import get_model
 from wb.utils.config import Config
 from wb.virtual.context import Context
@@ -11,12 +11,14 @@ from wb.virtual.context import Context
 class TestModel(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
+        self.wb_root_path = os.path.join(os.path.dirname(__file__), "data/wb/100_128")
         self.config = Config(os.path.join(os.path.dirname(__file__), "config.json"))
 
     def test_cnn(self):
         context = Context(self.config)
 
-        train_dataset, _ = dataset(self.config)
+        filename = os.path.join(self.wb_root_path, "wind_bench.parquet")
+        train_dataset = FileWBDataset(filename)
         X, y = train_dataset[0]
         print(X.shape, y.shape)
 

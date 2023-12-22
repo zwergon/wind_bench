@@ -39,7 +39,7 @@ def main():
     parser.add_argument(
         "-n",
         "--norm",
-        help="get predicted normalized",
+        help="display prediction normalized or not",
         action="store_true",
         default=False,
     )

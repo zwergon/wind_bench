@@ -6,6 +6,7 @@ import numpy as np
 
 from wb.dataset import FileWBDataset
 from wb.dataset.normalize import Normalize, MinMax
+from wb.dataset.sensor_description import WBSensorDescr
 
 import matplotlib.pyplot as plt
 
@@ -15,9 +16,7 @@ class TestNormalize(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.root_path = os.path.join(os.path.dirname(__file__), "data")
-        with open(os.path.join(self.root_path, "stats.json"), "r") as f:
-            self.stats = json.load(f)
+        self.root_path = os.path.join(os.path.dirname(__file__), "data", "wb")
         self.idx = 0
 
     def _test_normalize(self, norma: Normalize):
@@ -29,7 +28,7 @@ class TestNormalize(unittest.TestCase):
         X, Y = dataset[0]
         print(
             np.mean(X[self.idx, :]),
-            self.stats[FileWBDataset.x_columns[self.idx]]["mean"],
+            dataset.stats[dataset.x_columns[self.idx]]["mean"],
         )
 
         plt.plot(Y[0, :])
@@ -48,11 +47,17 @@ class TestNormalize(unittest.TestCase):
         plt.show()
 
     def test_normalize(self):
-        norma = Normalize(self.stats, FileWBDataset.x_columns, FileWBDataset.y_columns)
+        sensor_descr = WBSensorDescr()
+        norma = Normalize(
+            sensor_descr.stats, sensor_descr.x_columns, sensor_descr.y_columns
+        )
         self._test_normalize(norma)
 
     def test_minmax(self):
-        norma = MinMax(self.stats, FileWBDataset.x_columns, FileWBDataset.y_columns)
+        sensor_descr = WBSensorDescr()
+        norma = MinMax(
+            sensor_descr.stats, sensor_descr.x_columns, sensor_descr.y_columns
+        )
         self._test_normalize(norma)
 
 

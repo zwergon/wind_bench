@@ -1,5 +1,6 @@
 {
     "project": "wb_virtual",
+    "sensors": "wind_bench",
     "tracking_uri": "./mlruns",
     "normalization": true,
     "ratio_train_test": 0.9,

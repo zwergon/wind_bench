@@ -96,7 +96,7 @@ As output, each file provides 147 time series sampled at 100Hz over
 as well as to certain accelerations measured at certain points on the
 wind turbine, and also to forces and moments. These data, not normally
 available in reality, will enable us to perform supervised learning. The
-list of 147 signals supplied by DTU is provided in the appendix.
+list of 147 signals names supplied by DTU is given [here](./columns.txt).
 
 Sampling at 100Hz is too fast for the study we’re planning. We therefore
 resampled the signals to 20Hz, first passing a low-pass filter to avoid
@@ -190,6 +190,7 @@ by OpenFast (i.e. 12,000 points per signal).
 </a>
 
 The data structure for one of these 1000 samples is given <a href="#datastructure">fig</a> for the first `id=Exp0`. All 147 signals are sampled each 50ms during 10 minutes.
+
 
 Input signals
 -------------
@@ -510,29 +511,71 @@ with $x_{ij}$ the i-th value of the j-th signal, $x_{j}^{(max)}$ the
 highest value of the j-th signal and $x_{j}^{(min)}$ the smallest value
 of the j-th signal.
 
+Dataset length
+--------------
+
+> If we make this new assumption - that output signals do not depend temporally on input signals over a 10-minute window, but over a  shorter time window - we can deduce from the initial dataset a different dataset, better suited to the definition of our surragate model.
+
+Assuming that a window size of 1 minute is enough to capture the time dependancy of the surrogate model, a __learning dataset__ was then defined by reducing the size of input/output space of our signal to 1200 (instead of 12000). It means 1 minute timeserie instead of 10 minutes and it means also that we increase the number of samples available for learning by a factor 10. We then have more experiments and the datastructure length is then _up to 1200_ and not _up to 12000_ anymore.
+<a href='#fig:learning:dataset'>Figure</a> illustrates the way __learning dataset__ is deduced from __original dataset__ 
+
+<a id='fig:learning:dataset'><img src="./image/learning_dataset.svg" alt="image" width="900" height="auto"></a>
+
+
 Dataset balance
 ---------------
 
-After standardizing the data, it is divided into training and test data.
-90% of the data will be used for training and the remaining 10% for
-testing. In the figure below, the signals are represented two by two for
-the drive and test sets. The observation of the figure reveals that the
+Once our learning dataset is standardized according __min max__ normalization given statistical properties of all input/target signals, it is also randomly divided into training and testing dataset.
+90% (9000/10000 samples) of the data will be used for training and the remaining 10%(1000/10000 samples) for
+testing. 
+
+To validate that the testing dataset sufficiently samples the space defined by the 7 parameters of the plan, wind speed in the hub will be extracted from the 147 signals provided by `OpenFast` simulations.
+```python
+wind_columns = [
+    "Free wind speed Vx pos    0.00,   0.00,-150.00",
+    "Free wind speed Vy pos    0.00,   0.00,-150.00",
+    "Free wind speed Vz pos    0.00,   0.00,-150.00"
+]
+
+```
+
+One of this 10000 signals is illustrated on this <a href='#fig:wind:profile'>figure</a> where the _Wind Speed_ against the _Y_ axis is given for 1 minutes.
+
+<a id='fig:wind:profile'><img src="./image/free_wind_profile.png" ></a>
+
+On each of these 10000 signals, we compute $\mu_{V_y}$ (Wind Mean) and $\sigma_{V_y}$ (Standard Deviation of the Wind). 
+Then in $(\mu, \sigma)$ space each value is plotted on <a href='#fig:train:test:scatter'>figure</a>.
+
+The observation of the figure reveals that the
 test data are located in the training data region, thus emphasizing the
-consistency between the two sets. This approach makes it possible to
-evaluate the model’s ability to generalize data not used during
-training, thus contributing to evaluate its performance on unpublished
+consistency between the way training and testing datasets are split. 
+This approach makes it possible to
+evaluate where (which range) the model is able to generalize , ie 
+evaluate its performance on unpublished
 data.
 
+<a id='fig:train:test:scatter'><img src="./image/train_test_scatter.png" ></a>
 
+See [Wind Process Notebook](../notebooks/wind_process.ipynb) for further explications
 
 ### Summary
 
 At the end, what we want is to find a black box ( a surrogate model ) that, once it learned, can deduced the target signal given the input signals.
 
+
 ![Virtual Sensing](image/virtual_sensing_aim.png)
 
 
 #### Shape considerations
+It remains another degree of freedom. Given 8 $X$ inputs signals the surrogate model may deduce $Y$ output timeseries one by one or all in once.
+
+* One By One
+
+$ (10000, 8, 1200) \rightarrow (10000, 1, 1200)$ 
+
+* All in Once
+
+$ (10000, 8, 1200) \rightarrow (10000, 6, 1200)$ 
 
 
 Neural Networks

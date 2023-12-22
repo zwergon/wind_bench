@@ -26,6 +26,7 @@ def main():
             train_flag=True,
             train_test_ratio=config.ratio_train_test,
             indices=args.indices,
+            sensor_desc=config.sensors,
         )
         train_loader = DataLoader(
             train_dataset,
@@ -39,6 +40,7 @@ def main():
             train_flag=False,
             train_test_ratio=config.ratio_train_test,
             indices=args.indices,
+            sensor_desc=config.sensors,
         )
         test_loader = DataLoader(
             test_dataset,
