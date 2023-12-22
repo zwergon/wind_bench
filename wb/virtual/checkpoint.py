@@ -11,10 +11,6 @@ class CheckPoint:
     def state_dict(self):
         return self.params["model_state_dict"]
 
-    @property
-    def kind(self):
-        return self.params["kind"]
-
     @staticmethod
     def load(checkpoint_path: str):
         params = torch.load(checkpoint_path)
@@ -25,7 +21,8 @@ class CheckPoint:
 
     def save(self, filename, epoch, model, optimizer, loss):
         self.params["epoch"] = epoch
+        self.params["loss"] = loss
         self.params["model_state_dict"] = model.state_dict()
         self.params["optimizer_state_dict"] = optimizer.state_dict()
-        self.params["loss"] = loss
+        
         torch.save(self.params, filename)
