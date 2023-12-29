@@ -7,7 +7,6 @@ from wb.dataset import FileWBDataset
 from wb.utils.config import Config
 from wb.virtual.context import Context
 from wb.virtual.training import find_lr
-from wb.virtual.models import get_model
 from scripts.virtual.arguments import parse_args
 
 sys.path.append(os.getcwd())
@@ -31,9 +30,9 @@ def main():
             train_dataset, batch_size=args.batch_size, num_workers=4
         )
 
-        model = get_model(ctx, train_dataset.input_size, train_dataset.output_size)
+        ctx.create_model(train_loader)
 
-        find_lr(ctx, model, train_loader=train_loader)
+        find_lr(ctx, train_loader=train_loader)
 
 
 if __name__ == "__main__":

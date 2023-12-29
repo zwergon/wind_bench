@@ -3,43 +3,49 @@ import torch.nn as nn
 
 
 class UNet1D(nn.Module):
-    def __init__(self, input_size, output_size, kernel):
+    def __init__(self, input_size, output_size, config):
         super(UNet1D, self).__init__()
 
+        kernel_size = config["kernel_size"]
+
         self.conv_bloc_1 = nn.Sequential(
-            nn.Conv1d(input_size, 8, kernel_size=kernel, padding="same"),
+            nn.Conv1d(input_size, 8, kernel_size=kernel_size, padding="same"),
             nn.ReLU(),
-            nn.Conv1d(8, 8, kernel_size=kernel, padding="same"),
+            nn.Conv1d(8, 8, kernel_size=kernel_size, padding="same"),
             nn.ReLU(),
         )
 
         self.conv_bloc_2 = nn.Sequential(
             nn.MaxPool1d(2),
-            nn.Conv1d(8, 16, kernel_size=kernel, padding="same"),
+            nn.Conv1d(8, 16, kernel_size=kernel_size, padding="same"),
             nn.ReLU(),
-            nn.Conv1d(16, 16, kernel_size=kernel, padding="same"),
+            nn.Conv1d(16, 16, kernel_size=kernel_size, padding="same"),
             nn.ReLU(),
         )
 
         self.maxpool = nn.MaxPool1d(2)
         self.sampling = nn.Upsample(scale_factor=2)
-        self.wg_1 = nn.Conv1d(16, 16, kernel_size=kernel, padding="same")
-        self.ws_1 = nn.Conv1d(16, 16, kernel_size=kernel, padding="same")
+        self.wg_1 = nn.Conv1d(16, 16, kernel_size=kernel_size, padding="same")
+        self.ws_1 = nn.Conv1d(16, 16, kernel_size=kernel_size, padding="same")
 
         self.dec_block_1 = nn.Sequential(
             nn.ReLU(),
-            nn.Conv1d(16, 16, kernel_size=kernel, padding="same"),
+            nn.Conv1d(16, 16, kernel_size=kernel_size, padding="same"),
             nn.Sigmoid(),
         )
 
-        self.wg_2 = nn.Conv1d(16, 8, kernel_size=kernel, padding="same")
-        self.ws_2 = nn.Conv1d(8, 8, kernel_size=kernel, padding="same")
+        self.wg_2 = nn.Conv1d(16, 8, kernel_size=kernel_size, padding="same")
+        self.ws_2 = nn.Conv1d(8, 8, kernel_size=kernel_size, padding="same")
 
         self.dec_block_2 = nn.Sequential(
-            nn.ReLU(), nn.Conv1d(8, 8, kernel_size=kernel, padding="same"), nn.Sigmoid()
+            nn.ReLU(),
+            nn.Conv1d(8, 8, kernel_size=kernel_size, padding="same"),
+            nn.Sigmoid(),
         )
 
-        self.conv_out = nn.Conv1d(8, output_size, kernel_size=kernel, padding="same")
+        self.conv_out = nn.Conv1d(
+            8, output_size, kernel_size=kernel_size, padding="same"
+        )
         self.fc = nn.Linear(output_size, output_size)
 
     def forward(self, x):

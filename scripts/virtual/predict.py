@@ -8,7 +8,6 @@ from wb.utils.display import predictions_plot
 from wb.dataset import FileWBDataset
 from wb.virtual.context import Context
 from wb.virtual.checkpoint import CheckPoint
-from wb.virtual.models import get_model
 from wb.virtual.predictions import Predictions
 from wb.virtual.feature import Feature
 from wb.post.eq_load import eq_load
@@ -74,7 +73,7 @@ def main():
     print(f"Shape of predictions : {y_test.shape}")
     print(f"Type Network: {config.type}")
 
-    model = get_model(ctx, test_dataset.input_size, test_dataset.output_size)
+    model = ctx.create_model(test_loader)
     model.load_state_dict(checkpoint.state_dict)
 
     predictions.compute(model, ctx.device)

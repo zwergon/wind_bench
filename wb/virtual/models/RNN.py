@@ -6,9 +6,10 @@ import torch.nn as nn
 # according to https://www.kaggle.com/code/andradaolteanu/pytorch-rnns-and-lstms-explained-acc-0-99
 class RNNVanilla(nn.Module):
     # __init__: the function where we create the architecture
-    def __init__(self, input_size, output_size, hidden_size, dropout):
+    def __init__(self, input_size, output_size, config):
         super(RNNVanilla, self).__init__()
-        self.hidden_size = hidden_size
+        self.hidden_size = config["hidden_size"]
+        dropout = config["dropout"]
 
         # RNN Layer
         self.rnn = nn.RNN(input_size, self.hidden_size, batch_first=True)

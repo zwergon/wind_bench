@@ -3,7 +3,7 @@ import os
 import torch
 
 from wb.dataset import FileWBDataset
-from wb.virtual.models import get_model
+from wb.virtual.models import get_model, ModelError
 from wb.utils.config import Config
 from wb.virtual.context import Context
 
@@ -22,13 +22,33 @@ class TestModel(unittest.TestCase):
         X, y = train_dataset[0]
         print(X.shape, y.shape)
 
-        model = get_model(context, train_dataset.input_size, train_dataset.output_size)
+        model = get_model(
+            context.config,
+            train_dataset.input_size,
+            train_dataset.output_size,
+            context.device,
+        )
         print(model)
 
         X_tf = torch.from_numpy(X).view(1, X.shape[0], -1)
         print(X_tf.shape)
         predicted = model(X_tf)
         print(predicted.shape)
+
+    def test_unknown_model(self):
+        context = Context(self.config)
+        context.config["type"] = "unknown"
+
+        try:
+            model = None
+            model = get_model(
+                context.config,
+                8,
+                1,
+                context.device,
+            )
+        except ModelError:
+            self.assertTrue(model is None)
 
 
 if __name__ == "__main__":

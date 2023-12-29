@@ -4,10 +4,10 @@ import torch.nn as nn
 
 # Step 4: Define the LSTM model
 class LSTMCNNModel(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, output_size, dropout):
+    def __init__(self, input_size, output_size, config):
         super(LSTMCNNModel, self).__init__()
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
+        self.hidden_size = config["hidden_size"]
+        self.num_layers = config["num_layers"]
 
         self.encodeur = nn.Sequential(
             nn.Conv1d(input_size, 7, kernel_size=3, padding="same"),
@@ -24,8 +24,8 @@ class LSTMCNNModel(nn.Module):
             nn.ConvTranspose1d(7, 6, kernel_size=3, padding=padding),
         )
 
-        self.lstm = nn.LSTM(6, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
+        self.lstm = nn.LSTM(6, self.hidden_size, self.num_layers, batch_first=True)
+        self.fc = nn.Linear(self.hidden_size, output_size)
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
 

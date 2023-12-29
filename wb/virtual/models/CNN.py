@@ -2,8 +2,11 @@ import torch.nn as nn
 
 
 class CNNModel(nn.Module):
-    def __init__(self, input_size, output_size, kernel_size, dropout):
+    def __init__(self, input_size, output_size, config):
         super(CNNModel, self).__init__()
+
+        kernel_size = config["kernel_size"]
+        dropout = config["dropout"]
 
         self.encodeur = nn.Sequential(
             nn.Conv1d(input_size, 7, kernel_size=kernel_size, padding="same"),

@@ -9,21 +9,26 @@ from wb.virtual.predictions import Predictions
 from wb.virtual.metrics_collection import MetricsCollection
 
 
-def optimizer_function(config, model):
+def optimizer_function(context: Context):
+    config: Config = context.config
+    model = context.model
     if config["optimizer"] == "Adam":
-        return optim.Adam(
+        optimizer = optim.Adam(
             model.parameters(),
             lr=config["learning_rate"],
             weight_decay=config["weight_decay"],
         )
     elif config["optimizer"] == "SGD":
-        return optim.SGD(
+        optimizer = optim.SGD(
             model.parameters(),
             lr=config["learning_rate"],
             weight_decay=config["weight_decay"],
         )
     else:
         raise Exception("Unknown optimizer")
+
+    context.checkpoint.optimizer = optimizer
+    return optimizer
 
 
 def scheduler_function(optimizer):
@@ -39,15 +44,16 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def find_lr(context: Context, model, train_loader):
+def find_lr(context: Context, train_loader):
     device = context.device
+    model = context.model
     config: Config = context.config
 
     num_epochs = config["epochs"]
 
     num_batch = len(train_loader)
 
-    optimizer = optimizer_function(config, model)
+    optimizer = optimizer_function(context)
 
     loss_fct = loss_function(config, device)
 
@@ -84,18 +90,19 @@ def find_lr(context: Context, model, train_loader):
     context.report_lr_find(lrs, losses)
 
 
-def train_test(context: Context, model, train_loader, test_loader):
+def train_test(context: Context, train_loader, test_loader):
     device = context.device
+    model = context.model
     config: Config = context.config
     train_dataset: WBDataset = train_loader.dataset
 
     num_epochs = config["epochs"]
 
-    context.summary(train_loader, test_loader)
+    context.summary()
 
     criterion = loss_function(config, device)
 
-    optimizer = optimizer_function(config, model)
+    optimizer = optimizer_function(context)
 
     scheduler = scheduler_function(optimizer)
 
@@ -159,9 +166,6 @@ def train_test(context: Context, model, train_loader, test_loader):
 
             context.report_prediction(epoch, predictions)
 
-            context.save_checkpoint(
-                epoch=epoch,
-                model=model,
-                optimizer=optimizer,
-                loss=test_loss
-            )
+            context.save_checkpoint(epoch=epoch, loss=test_loss)
+
+    context.save_model()

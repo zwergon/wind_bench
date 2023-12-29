@@ -5,6 +5,9 @@ import torch
 class CheckPoint:
     def __init__(self, path=None) -> None:
         self.params = {}
+        self.model = None
+        self.optimizer = None
+        self.signature = None
         self.path = path
 
     @property
@@ -19,9 +22,13 @@ class CheckPoint:
 
         return checkpoint
 
-    def save(self, filename, epoch, model, optimizer, loss):
+    def save(self, filename, epoch, loss):
+        assert (
+            self.model is not None
+        ), "model need first to be assigned to checkpoint before saving"
         self.params["epoch"] = epoch
         self.params["loss"] = loss
-        self.params["model_state_dict"] = model.state_dict()
-        self.params["optimizer_state_dict"] = optimizer.state_dict()
+        self.params["model_state_dict"] = self.model.state_dict()
+        if self.optimizer is not None:
+            self.params["optimizer_state_dict"] = self.optimizer.state_dict()
         torch.save(self.params, filename)

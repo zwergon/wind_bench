@@ -4,7 +4,6 @@ import sys
 from torch.utils.data import DataLoader
 
 from wb.dataset import FileWBDataset
-from wb.virtual.models import get_model
 from wb.virtual.training import train_test
 from wb.virtual.context import Context
 from wb.utils.config import Config
@@ -49,9 +48,9 @@ def main():
             num_workers=config.num_workers,
         )
 
-        model = get_model(ctx, train_dataset.input_size, train_dataset.output_size)
+        ctx.create_model(train_loader)
 
-        train_test(ctx, model, train_loader, test_loader)
+        train_test(ctx, train_loader, test_loader)
 
 
 if __name__ == "__main__":
