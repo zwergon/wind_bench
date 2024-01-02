@@ -28,7 +28,7 @@ dynamic = ["dependencies"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools]
-packages = ["wb", "scripts"]
+packages = ["wb"]
 
 [project.scripts]
 wb-train = "scripts.virtual.train:main"
