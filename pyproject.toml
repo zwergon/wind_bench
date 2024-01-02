@@ -28,7 +28,18 @@ dynamic = ["dependencies"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools]
-packages = ["wb", "scripts"]
+packages =  [
+  "wb",
+  "wb.dataset",
+  "wb.dataset.s3",
+  "wb.dataset.utils",
+  "wb.post",
+  "wb.virtual",
+  "wb.virtual.models",
+  "wb.virtual.loss_function",
+  "scripts",
+  "scripts.virtual"
+]
 
 [project.scripts]
 wb-train = "scripts.virtual.train:main"
