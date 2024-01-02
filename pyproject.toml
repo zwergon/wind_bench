@@ -28,7 +28,7 @@ dynamic = ["dependencies"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages]
-find =  { namespace = false }
+find = {namespaces = false}  # Disable implicit namespaces
 
 [project.scripts]
 wb-train = "scripts.virtual.train:main"
