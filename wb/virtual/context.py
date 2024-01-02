@@ -27,6 +27,7 @@ class Context:
         self._config = config
         self.experiment_id = None
         self.checkpoint: CheckPoint = checkpoint
+        self.agg = matplotlib.rcParams['backend']
 
         self.device = torch.device(
             "cuda" if config.cuda and torch.cuda.is_available() else "cpu"
@@ -56,7 +57,7 @@ class Context:
         return self.checkpoint.model
 
     def close(self):
-        matplotlib.use("TkAgg")
+        matplotlib.use(self.agg)
         mlflow.end_run()
 
     def create_model(self, loader):
