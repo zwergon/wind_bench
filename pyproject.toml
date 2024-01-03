@@ -28,13 +28,13 @@ dynamic = ["dependencies"]
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages]
-find = {namespaces = false}  # Disable implicit namespaces
+find = {} 
 
 [project.scripts]
-wb-train = "scripts.virtual.train:main"
-wb-predict = "scripts.virtual.predict:main"
-wb-display = "scripts.virtual.display:main"
-wb-findlr = "scripts.virtual.find_lr:main"
+wb-train = "wb.scripts:main_train"
+wb-predict = "wb.scripts:main_predict"
+wb-display = "wb.scripts:main_display"
+wb-findlr = "wb.scripts:main_findlr"
 
 [project.urls]
 "Homepage" = "https://github.com/zwergon/wind_bench"

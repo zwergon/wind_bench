@@ -1,6 +1,8 @@
 import os
 import argparse
 
+from wb.utils.config import Config
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -40,6 +42,6 @@ def parse_args():
         "--config",
         help="training config file",
         type=str,
-        default=os.path.join(os.path.dirname(__file__), "config.json"),
+        default=Config.default_path(),
     )
     return parser.parse_args()
