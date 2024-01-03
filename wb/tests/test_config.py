@@ -22,7 +22,9 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.sensors, "wind_bench")
 
     def test_config_file(self):
-        config = Config(os.path.join(os.path.dirname(__file__), "data", "config.json"))
+        config = Config(
+            os.path.join(os.path.dirname(__file__), "../data", "config.json")
+        )
         self.assertTrue(config is not None)
         self.assertEqual(config.project, "wb_virtual_tests")
 

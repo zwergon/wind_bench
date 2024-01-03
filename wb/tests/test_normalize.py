@@ -15,7 +15,7 @@ class TestNormalize(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.root_path = os.path.join(os.path.dirname(__file__), "data", "wb")
+        self.root_path = os.path.join(os.path.dirname(__file__), "../data/wb")
         self.idx = 0
 
     def _test_normalize(self, norma: Normalize):

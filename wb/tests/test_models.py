@@ -11,7 +11,9 @@ from wb.virtual.context import Context
 class TestModel(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.wb_root_path = os.path.join(os.path.dirname(__file__), "data/wb/100_128")
+        self.wb_root_path = os.path.join(
+            os.path.dirname(__file__), "../data/wb/100_128"
+        )
         self.config = Config.test_config()
 
     def test_cnn(self):

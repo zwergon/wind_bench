@@ -19,6 +19,28 @@ This repository contains a python module for testing different neural network ar
 
 # Quick start
 
+### Installation for users
+
+1. First create a python environment and activate it
+
+
+```bash
+python -m venv venv
+. venv/bin/activate
+```
+
+2. Install the python module wb-virtual in it from git using the main branch.
+
+```bash
+pip install git+https://github.com/zwergon/wind_bench.git@main
+```
+
+3. use entry points defined in the package
+    - `wb-train` to train a model
+    - `wb-display` to display what kind of virtual sensing you are trying to do
+    - `wb-predict` to make a prediction using a learned checkpoint
+     
+
 ### Installation for developers
 
 Install the module and dependencies in a virtual environment with Python 3.7-3.10.

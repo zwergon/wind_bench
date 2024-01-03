@@ -11,9 +11,11 @@ class TestDataset(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.wb_root_path = os.path.join(os.path.dirname(__file__), "data/wb/100_128")
+        self.wb_root_path = os.path.join(
+            os.path.dirname(__file__), "../data/wb/100_128"
+        )
         self.toy_root_path = os.path.join(
-            os.path.dirname(__file__), "data/fivestorybuilding/100_200"
+            os.path.dirname(__file__), "../data/fivestorybuilding/100_200"
         )
 
     def test_windbench_dataset(self):

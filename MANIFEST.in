@@ -1,1 +1,3 @@
 include wb/utils/cf/*.json
+include wb/data/wb/stats.json
+include wb/data/wb/100_128/wind_bench.parquet/*/*
