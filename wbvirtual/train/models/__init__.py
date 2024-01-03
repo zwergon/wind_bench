@@ -1,9 +1,9 @@
-from wb.virtual.models.LSTM_CNN import LSTMCNNModel
-from wb.virtual.models.LSTM import LSTMModel
-from wb.virtual.models.CNN import CNNModel
-from wb.virtual.models.MLP import MLPModel
-from wb.virtual.models.RNN import RNNVanilla
-from wb.virtual.models.UNet1D import UNet1D
+from wbvirtual.train.models.LSTM_CNN import LSTMCNNModel
+from wbvirtual.train.models.LSTM import LSTMModel
+from wbvirtual.train.models.CNN import CNNModel
+from wbvirtual.train.models.MLP import MLPModel
+from wbvirtual.train.models.RNN import RNNVanilla
+from wbvirtual.train.models.UNet1D import UNet1D
 
 
 models_dict = {

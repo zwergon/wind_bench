@@ -3,9 +3,9 @@ import numpy as np
 from tqdm import tqdm
 import pyarrow.parquet as pq
 
-from wb.dataset.s3 import S3
+from wbvirtual.dataset.s3 import S3
 
-from wb.utils.config import Config
+from wbvirtual.utils.config import Config
 
 
 def download_s3(root_path, parquet_file, n_items):

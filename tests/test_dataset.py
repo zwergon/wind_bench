@@ -1,9 +1,9 @@
 import unittest
 import os
 
-from wb.dataset.dataloader import NaiveDataLoader
-from wb.utils.time_utils import Timer
-from wb.dataset import FileWBDataset, NumpyWBDataset
+from wbvirtual.dataset.dataloader import NaiveDataLoader
+from wbvirtual.utils.time_utils import Timer
+from wbvirtual.dataset import FileWBDataset, NumpyWBDataset
 
 
 class TestDataset(unittest.TestCase):
@@ -11,11 +11,9 @@ class TestDataset(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.wb_root_path = os.path.join(
-            os.path.dirname(__file__), "../data/wb/100_128"
-        )
+        self.wb_root_path = os.path.join(os.path.dirname(__file__), "data/wb/100_128")
         self.toy_root_path = os.path.join(
-            os.path.dirname(__file__), "../data/fivestorybuilding/100_200"
+            os.path.dirname(__file__), "data/fivestorybuilding/100_200"
         )
 
     def test_windbench_dataset(self):

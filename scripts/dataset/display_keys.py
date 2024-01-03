@@ -1,7 +1,7 @@
 import os
 import sys
 import argparse
-from wb.dataset import FileWBDataset
+from wbvirtual.dataset import FileWBDataset
 
 sys.path.append(os.getcwd())
 

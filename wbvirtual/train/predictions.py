@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from wb.dataset import WBDataset
+from wbvirtual.dataset import WBDataset
 
 
 class Predictions:

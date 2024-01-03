@@ -1,5 +1,5 @@
 from torch import nn
-from wb.virtual.loss_function.rmse import RMSELoss
+from wbvirtual.train.loss_function.rmse import RMSELoss
 
 
 def loss_function(config: dict, device):

@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 
 from torch.utils.data import DataLoader
 
-from wb.utils.config import Config
-from wb.utils.arguments import parse_args
-from wb.utils.display import predictions_plot
-from wb.dataset import FileWBDataset
-from wb.virtual.context import Context
-from wb.virtual.checkpoint import CheckPoint
-from wb.virtual.training import train_test, find_lr
-from wb.virtual.predictions import Predictions
-from wb.virtual.feature import Feature
-from wb.post.eq_load import eq_load
+from wbvirtual.utils.config import Config
+from wbvirtual.utils.arguments import parse_args
+from wbvirtual.utils.display import predictions_plot
+from wbvirtual.dataset import FileWBDataset
+from wbvirtual.train.context import Context
+from wbvirtual.train.checkpoint import CheckPoint
+from wbvirtual.train.training import train_test, find_lr
+from wbvirtual.train.predictions import Predictions
+from wbvirtual.train.feature import Feature
+from wbvirtual.post.eq_load import eq_load
 
 from sklearn.metrics import r2_score
 

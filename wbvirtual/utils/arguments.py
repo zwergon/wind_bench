@@ -1,6 +1,6 @@
 import argparse
 
-from wb.utils.config import Config
+from wbvirtual.utils.config import Config
 
 
 def parse_args():

@@ -1,4 +1,4 @@
-from wb.virtual.predictions import Predictions
+from wbvirtual.train.predictions import Predictions
 
 
 class Feature:

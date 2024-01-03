@@ -10,12 +10,12 @@ import mlflow
 from mlflow.models import ModelSignature
 from mlflow.types.schema import TensorSpec, Schema
 
-from wb.utils.config import Config
-from wb.utils.display import predictions_plot
-from wb.dataset import WBDataset
-from wb.virtual.checkpoint import CheckPoint
-from wb.virtual.predictions import Predictions
-from wb.virtual.models import get_model
+from wbvirtual.utils.config import Config
+from wbvirtual.utils.display import predictions_plot
+from wbvirtual.dataset import WBDataset
+from wbvirtual.train.checkpoint import CheckPoint
+from wbvirtual.train.predictions import Predictions
+from wbvirtual.train.models import get_model
 
 
 class Context:
@@ -27,7 +27,7 @@ class Context:
         self._config = config
         self.experiment_id = None
         self.checkpoint: CheckPoint = checkpoint
-        self.agg = matplotlib.rcParams['backend']
+        self.agg = matplotlib.rcParams["backend"]
 
         self.device = torch.device(
             "cuda" if config.cuda and torch.cuda.is_available() else "cpu"
@@ -145,7 +145,7 @@ class Context:
         plt.close(fig)
 
     def report_lr_find(self, lr, losses):
-        from wb.utils.display import lrfind_plot
+        from wbvirtual.utils.display import lrfind_plot
 
         fig = lrfind_plot(lr, losses)
         mlflow.log_figure(fig, "lr_find.png")

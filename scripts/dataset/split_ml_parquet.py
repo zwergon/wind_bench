@@ -1,7 +1,7 @@
 import os
 import pyarrow.parquet as pq
 
-from wb.dataset import FileWBDataset
+from wbvirtual.dataset import FileWBDataset
 
 
 def download_split(in_parquet_file, out_parquet_file, n_items, split):

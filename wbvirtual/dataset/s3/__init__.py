@@ -1,5 +1,5 @@
 import boto3
-from wb.dataset.s3.config import Config
+from wbvirtual.dataset.s3.config import Config
 from pyarrow import fs
 
 

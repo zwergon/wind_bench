@@ -1,6 +1,6 @@
 import json
 
-from wb.utils.meta_singleton import MetaSingleton
+from wbvirtual.utils.meta_singleton import MetaSingleton
 
 
 class Config(object, metaclass=MetaSingleton):

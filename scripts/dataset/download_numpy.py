@@ -3,9 +3,9 @@ import pyarrow.parquet as pq
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from wb.dataset.s3 import S3
-from wb.dataset import WBDataset
-from wb.utils.config import Config
+from wbvirtual.dataset.s3 import S3
+from wbvirtual.dataset import WBDataset
+from wbvirtual.utils.config import Config
 from tqdm import tqdm
 
 

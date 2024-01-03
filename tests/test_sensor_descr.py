@@ -1,6 +1,6 @@
 import unittest
 
-from wb.dataset.sensor_description import SensorDescr
+from wbvirtual.dataset.sensor_description import SensorDescr
 
 
 class TestSensorDescr(unittest.TestCase):

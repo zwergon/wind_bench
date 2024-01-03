@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.signal import butter, filtfilt
 
-from wb.post.rainflow import rainflow
+from wbvirtual.post.rainflow import rainflow
 
 
 def _turningpoints(lst):

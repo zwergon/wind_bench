@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from wb.virtual.predictions import Predictions
-from wb.dataset import WBDataset
+from wbvirtual.train.predictions import Predictions
+from wbvirtual.dataset import WBDataset
 
 
 def smooth(liste, beta=0.98):

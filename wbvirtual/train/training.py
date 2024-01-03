@@ -1,12 +1,12 @@
 import torch
 import torch.optim as optim
 
-from wb.dataset import WBDataset
-from wb.virtual.loss_function import loss_function
-from wb.virtual.context import Context
-from wb.utils.config import Config
-from wb.virtual.predictions import Predictions
-from wb.virtual.metrics_collection import MetricsCollection
+from wbvirtual.dataset import WBDataset
+from wbvirtual.train.loss_function import loss_function
+from wbvirtual.train.context import Context
+from wbvirtual.utils.config import Config
+from wbvirtual.train.predictions import Predictions
+from wbvirtual.train.metrics_collection import MetricsCollection
 
 
 def optimizer_function(context: Context):

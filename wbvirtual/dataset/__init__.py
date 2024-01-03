@@ -6,8 +6,8 @@ import pandas as pd
 
 from torch.utils.data import Dataset
 
-from wb.dataset.normalize import Scaling
-from wb.dataset.sensor_description import SensorDescr
+from wbvirtual.dataset.normalize import Scaling
+from wbvirtual.dataset.sensor_description import SensorDescr
 
 
 class WBDataset(Dataset):

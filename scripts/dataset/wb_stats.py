@@ -1,8 +1,8 @@
 import pyarrow.parquet as pq
 import json
 
-from wb.dataset.s3 import S3
-from wb.dataset import WBDataset
+from wbvirtual.dataset.s3 import S3
+from wbvirtual.dataset import WBDataset
 
 
 def extract_stats(columns):

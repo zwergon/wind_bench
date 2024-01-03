@@ -2,18 +2,16 @@ import unittest
 import os
 import torch
 
-from wb.dataset import FileWBDataset
-from wb.virtual.models import get_model, ModelError
-from wb.utils.config import Config
-from wb.virtual.context import Context
+from wbvirtual.dataset import FileWBDataset
+from wbvirtual.train.models import get_model, ModelError
+from wbvirtual.utils.config import Config
+from wbvirtual.train.context import Context
 
 
 class TestModel(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.wb_root_path = os.path.join(
-            os.path.dirname(__file__), "../data/wb/100_128"
-        )
+        self.wb_root_path = os.path.join(os.path.dirname(__file__), "data/wb/100_128")
         self.config = Config.test_config()
 
     def test_cnn(self):

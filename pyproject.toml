@@ -27,14 +27,24 @@ dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[tool.setuptools.packages]
-find = {} 
+[tool.setuptools]
+packages = [ 
+  "wbvirtual",
+  "wbvirtual.dataset",
+  "wbvirtual.dataset.s3",
+  "wbvirtual.post",
+  "wbvirtual.scripts",
+  "wbvirtual.train",
+  "wbvirtual.train.loss_function",
+  "wbvirtual.train.models",
+  "wbvirtual.utils"
+] 
 
 [project.scripts]
-wb-train = "wb.scripts:main_train"
-wb-predict = "wb.scripts:main_predict"
-wb-display = "wb.scripts:main_display"
-wb-findlr = "wb.scripts:main_findlr"
+wb-train = "wbvirtual.scripts:main_train"
+wb-predict = "wbvirtual.scripts:main_predict"
+wb-display = "wbvirtual.scripts:main_display"
+wb-findlr = "wbvirtual.scripts:main_findlr"
 
 [project.urls]
 "Homepage" = "https://github.com/zwergon/wind_bench"

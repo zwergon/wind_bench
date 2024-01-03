@@ -3,9 +3,9 @@ import os
 
 import numpy as np
 
-from wb.dataset import FileWBDataset
-from wb.dataset.normalize import Normalize, MinMax
-from wb.dataset.sensor_description import WBSensorDescr
+from wbvirtual.dataset import FileWBDataset
+from wbvirtual.dataset.normalize import Normalize, MinMax
+from wbvirtual.dataset.sensor_description import WBSensorDescr
 
 import matplotlib.pyplot as plt
 
@@ -15,7 +15,7 @@ class TestNormalize(unittest.TestCase):
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
-        self.root_path = os.path.join(os.path.dirname(__file__), "../data/wb")
+        self.root_path = os.path.join(os.path.dirname(__file__), "data/wb")
         self.idx = 0
 
     def _test_normalize(self, norma: Normalize):
