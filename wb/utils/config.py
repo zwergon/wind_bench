@@ -29,7 +29,7 @@ class Config:
 
     @staticmethod
     def default_config():
-        return Config(Config.default_path)
+        return Config(Config.default_path())
 
     @staticmethod
     def test_config():

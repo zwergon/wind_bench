@@ -9,5 +9,3 @@ tqdm
 matplotlib
 scikit-learn
 psutil
-wb-virtual @ git+https://github.com/zwergon/wind_bench.git@main
-
