@@ -1,4 +1,3 @@
-import os
 import argparse
 import matplotlib.pyplot as plt
 
@@ -16,7 +15,6 @@ from wb.virtual.feature import Feature
 from wb.post.eq_load import eq_load
 
 from sklearn.metrics import r2_score
-
 
 
 def main_display():
@@ -92,7 +90,6 @@ def main_display():
     ax2.legend()
 
     plt.show()
-
 
 
 def main_findlr():
@@ -200,10 +197,6 @@ def main_predict():
     plt.show()
 
 
-
-
-
-
 def main_train():
     args = parse_args()
 
@@ -242,5 +235,3 @@ def main_train():
         ctx.create_model(train_loader)
 
         train_test(ctx, train_loader, test_loader)
-
-

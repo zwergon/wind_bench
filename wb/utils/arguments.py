@@ -1,4 +1,3 @@
-import os
 import argparse
 
 from wb.utils.config import Config

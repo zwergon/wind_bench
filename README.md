@@ -15,17 +15,7 @@ This repository contains a python module for testing different neural network ar
 
 | <img src="./assets/images/virtual_sensing_aim.png" >
 
----
 
-Date: 2023-12-17
-
-Author: [github@zwergon](https://github.com/zwergon)
-
-Copyright © 2022 Jean-François Lecomte
-
-MIT License ([see here](LICENSE.md))
-
----
 
 # Quick start
 
@@ -48,3 +38,15 @@ You can simply run a train on this dataset from root folder:
 ```bash
 python scripts/virtual/train.py tests/data/100_128/wind_bench.parquet 
 ```
+
+---
+
+Date: 2023-12-17
+
+Author: [github@zwergon](https://github.com/zwergon)
+
+Copyright © 2022 Jean-François Lecomte
+
+MIT License ([see here](LICENSE.md))
+
+---
