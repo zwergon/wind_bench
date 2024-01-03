@@ -13,3 +13,7 @@ class Feature:
             self.actual.append(actual_del)
             predicted_del = self.computer(predictions.predicted[i, 0, :], **kwargs)
             self.predicted.append(predicted_del)
+<<<<<<< HEAD:wbvirtual/train/feature.py
+=======
+
+>>>>>>> 73c12bb (commit):wb/virtual/feature.py
