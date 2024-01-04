@@ -149,7 +149,6 @@ def train_test(context: Context, train_loader, test_loader):
 
                 test_loss += loss.item()
                 test_metrics.update_from_batch(Y_hat, Y)
-
         test_loss /= len(test_loader)
         test_metrics.compute()
 

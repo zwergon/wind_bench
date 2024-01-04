@@ -13,6 +13,7 @@ from wbvirtual.train.training import train_test, find_lr
 from wbvirtual.train.predictions import Predictions
 from wbvirtual.train.feature import Feature
 from wbvirtual.post.eq_load import eq_load
+from wbvirtual.train.metric_plot import MetricsBoxPlot
 
 from sklearn.metrics import r2_score
 
@@ -193,7 +194,10 @@ def main_predict():
 
     print(f"r2score for DEL: {r2_score(feature.actual, feature.predicted)}")
     plt.scatter(feature.actual, feature.predicted)
+    plt.show()
 
+    r2 = MetricsBoxPlot(r2_score)
+    r2.compute(predictions)
     plt.show()
 
 
