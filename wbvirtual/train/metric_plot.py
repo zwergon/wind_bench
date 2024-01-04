@@ -3,27 +3,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from wbvirtual.train.predictions import Predictions
 
-
 class MetricsBoxPlot:
     def __init__(self, metric):
         self.metric = metric
 
     def compute(self, predictions: Predictions):
-        result_list = []
-        labels = []
-        Y = torch.tensor(predictions.actual)
-        y_hat = torch.tensor(predictions.predicted)
+        Y = predictions.actual
+        y_hat = predictions.predicted
 
-        for d in range(Y.size(0)):
-            trans_input = Y[d, :, :].transpose(0, 1)
-            trans_target = y_hat[d, :, :].transpose(0, 1)
-            results = self.metric(trans_input, trans_target)
-            result_list.append(results.numpy())
-        transposed_arrays = np.transpose(result_list)
-        result_list = [np.array(sub_array) for sub_array in transposed_arrays]
+        result_list = [
+            [self.metric(Y[i, j, :], y_hat[i, j, :]) for j in range(Y.shape[1])]
+            for i in range(Y.shape[0])
+        ]
 
-        for i in range(len(result_list)):
-            labels.append(f"col_{i+1}")
+        result_list = np.transpose(result_list)
+        result_list = [np.array(sub_array) for sub_array in result_list]
+        labels = [f"col_{i+1}" for i in range(len(result_list))]
+
         fig, ax = plt.subplots()
         ax.boxplot(result_list, vert=True, patch_artist=True, labels=labels)
 
